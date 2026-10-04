@@ -1,7 +1,10 @@
 package pe.mypeinventario.domain;
 
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,12 +12,12 @@ import pe.mypeinventario.config.ConfiguracionTienda;
 
 /**
  * Unidad mínima de inventario: una combinación de talla y color de un
- * {@link ProductoItem}, con su código, precios y stock mínimo propios.
+ * {@link ProductoItem}. Su stock no se guarda: se deriva de la suma de sus
+ * {@link MovimientoInventario}, que solo se agregan y nunca se editan.
  */
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class VarianteSKU {
 
     private Long id;
@@ -27,13 +30,73 @@ public class VarianteSKU {
     /** Stock mínimo propio; si es {@code null} se usa el valor por defecto de la tienda. */
     private Integer stockMinimo;
 
+    @Setter(AccessLevel.NONE)
+    private List<MovimientoInventario> movimientos = new ArrayList<>();
+
+    @Setter(AccessLevel.NONE)
+    private List<AlertaReabastecimiento> alertas = new ArrayList<>();
+
+    public VarianteSKU(Long id, String sku, String codigoBarras, String talla, String color,
+                       BigDecimal precioCompra, BigDecimal precioVenta, Integer stockMinimo) {
+        this.id = id;
+        this.sku = sku;
+        this.codigoBarras = codigoBarras;
+        this.talla = talla;
+        this.color = color;
+        this.precioCompra = precioCompra;
+        this.precioVenta = precioVenta;
+        this.stockMinimo = stockMinimo;
+    }
+
+    /** @return vista de solo lectura del historial de movimientos */
+    public List<MovimientoInventario> getMovimientos() {
+        return Collections.unmodifiableList(movimientos);
+    }
+
+    /** @return vista de solo lectura de las alertas generadas */
+    public List<AlertaReabastecimiento> getAlertas() {
+        return Collections.unmodifiableList(alertas);
+    }
+
+    /**
+     * Calcula el stock actual sumando el efecto de todos los movimientos.
+     *
+     * @return unidades disponibles
+     */
+    // JPA (Etapa 2): con muchos movimientos conviene calcularlo con una consulta SUM en el repository.
+    public int calcularStock() {
+        int stock = 0;
+        for (MovimientoInventario movimiento : movimientos) {
+            stock += movimiento.calcularEfecto();
+        }
+        return stock;
+    }
+
+    /**
+     * Registra un movimiento en el historial, siempre que no deje el stock negativo.
+     *
+     * @param movimiento movimiento a registrar
+     * @throws IllegalArgumentException si el movimiento es nulo
+     * @throws IllegalStateException    si la salida supera el stock disponible
+     */
+    public void registrarMovimiento(MovimientoInventario movimiento) {
+        if (movimiento == null) {
+            throw new IllegalArgumentException("El movimiento no puede ser nulo");
+        }
+        int stockResultante = calcularStock() + movimiento.calcularEfecto();
+        if (stockResultante < 0) {
+            throw new IllegalStateException(
+                    "Stock insuficiente para la variante " + sku + ": quedaría en " + stockResultante);
+        }
+        movimientos.add(movimiento);
+    }
+
     /**
      * Determina el stock mínimo que aplica a esta variante: el propio, si lo tiene,
-     * o el valor por defecto de la configuración. La configuración se recibe como
-     * parámetro para que la dependencia sea visible y se pueda probar con otra.
+     * o el valor por defecto de la configuración.
      *
      * @param config configuración global de la tienda
-     * @return el stock mínimo vigente para esta variante
+     * @return el stock mínimo vigente
      * @throws IllegalArgumentException si la configuración es nula
      */
     public int resolverStockMinimo(ConfiguracionTienda config) {
@@ -41,5 +104,28 @@ public class VarianteSKU {
             throw new IllegalArgumentException("La configuración es obligatoria");
         }
         return stockMinimo != null ? stockMinimo : config.getStockMinimoPorDefecto();
+    }
+
+    /**
+     * Indica si el stock actual alcanzó o bajó del mínimo.
+     *
+     * @param config configuración global de la tienda
+     * @return {@code true} si hace falta reabastecer
+     */
+    public boolean requiereReabastecimiento(ConfiguracionTienda config) {
+        return calcularStock() <= resolverStockMinimo(config);
+    }
+
+    /**
+     * Asocia una alerta generada a esta variante.
+     *
+     * @param alerta alerta a asociar
+     * @throws IllegalArgumentException si la alerta es nula
+     */
+    public void agregarAlerta(AlertaReabastecimiento alerta) {
+        if (alerta == null) {
+            throw new IllegalArgumentException("La alerta no puede ser nula");
+        }
+        alertas.add(alerta);
     }
 }
