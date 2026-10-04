@@ -8,7 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pe.mypeinventario.config.ConfiguracionTienda;
+import pe.mypeinventario.config.ParametrosStock;
 
 /**
  * Unidad mínima de inventario: una combinación de talla y color de un
@@ -93,27 +93,27 @@ public class VarianteSKU {
 
     /**
      * Determina el stock mínimo que aplica a esta variante: el propio, si lo tiene,
-     * o el valor por defecto de la configuración.
+     * o el valor por defecto de los parámetros recibidos.
      *
-     * @param config configuración global de la tienda
+     * @param parametros parámetros de stock (por ejemplo, la configuración de la tienda)
      * @return el stock mínimo vigente
-     * @throws IllegalArgumentException si la configuración es nula
+     * @throws IllegalArgumentException si los parámetros son nulos
      */
-    public int resolverStockMinimo(ConfiguracionTienda config) {
-        if (config == null) {
-            throw new IllegalArgumentException("La configuración es obligatoria");
+    public int resolverStockMinimo(ParametrosStock parametros) {
+        if (parametros == null) {
+            throw new IllegalArgumentException("Los parámetros de stock son obligatorios");
         }
-        return stockMinimo != null ? stockMinimo : config.getStockMinimoPorDefecto();
+        return stockMinimo != null ? stockMinimo : parametros.getStockMinimoPorDefecto();
     }
 
     /**
      * Indica si el stock actual alcanzó o bajó del mínimo.
      *
-     * @param config configuración global de la tienda
+     * @param parametros parámetros de stock (por ejemplo, la configuración de la tienda)
      * @return {@code true} si hace falta reabastecer
      */
-    public boolean requiereReabastecimiento(ConfiguracionTienda config) {
-        return calcularStock() <= resolverStockMinimo(config);
+    public boolean requiereReabastecimiento(ParametrosStock parametros) {
+        return calcularStock() <= resolverStockMinimo(parametros);
     }
 
     /**
