@@ -11,8 +11,8 @@ import lombok.Setter;
 
 /**
  * Dueño de uno o más negocios que usa el sistema para gestionar su inventario.
- * Mantiene una agregación con sus {@link Tienda}: las tiendas existen
- * independientemente del comerciante.
+ * Mantiene una agregación con sus {@link Tienda} (existen independientemente de
+ * él) y una asociación con sus {@link Suscripcion}.
  */
 @Getter
 @Setter
@@ -24,6 +24,9 @@ public class Comerciante extends Usuario {
     @Setter(AccessLevel.NONE)
     private List<Tienda> tiendas = new ArrayList<>();
 
+    @Setter(AccessLevel.NONE)
+    private List<Suscripcion> suscripciones = new ArrayList<>();
+
     public Comerciante(Long id, String nombre, String correo, String celular,
                        String contrasenaHash, LocalDate fechaRegistro) {
         super(id, nombre, correo, celular, contrasenaHash);
@@ -33,6 +36,11 @@ public class Comerciante extends Usuario {
     /** @return vista de solo lectura de las tiendas del comerciante */
     public List<Tienda> getTiendas() {
         return Collections.unmodifiableList(tiendas);
+    }
+
+    /** @return vista de solo lectura del historial de suscripciones */
+    public List<Suscripcion> getSuscripciones() {
+        return Collections.unmodifiableList(suscripciones);
     }
 
     /**
@@ -48,5 +56,18 @@ public class Comerciante extends Usuario {
         if (!tiendas.contains(tienda)) {
             tiendas.add(tienda);
         }
+    }
+
+    /**
+     * Registra una suscripción contratada por el comerciante.
+     *
+     * @param suscripcion suscripción a registrar
+     * @throws IllegalArgumentException si la suscripción es nula
+     */
+    public void agregarSuscripcion(Suscripcion suscripcion) {
+        if (suscripcion == null) {
+            throw new IllegalArgumentException("La suscripción no puede ser nula");
+        }
+        suscripciones.add(suscripcion);
     }
 }
