@@ -1,0 +1,227 @@
+classDiagram
+    direction TB
+
+    %% ========== HERENCIA: usuarios ==========
+    class Usuario {
+        <<abstract>>
+        -Long id
+        -String nombre
+        -String correo
+        -String celular
+        -String contrasenaHash
+    }
+    class Comerciante {
+        -LocalDate fechaRegistro
+        +agregarTienda(Tienda) void
+        +agregarSuscripcion(Suscripcion) void
+    }
+    class ProveedorMayorista {
+        -String razonSocial
+        -String ruc
+    }
+
+    %% ========== NEGOCIO Y CATALOGO ==========
+    class Tienda {
+        -Long id
+        -String nombre
+        -String direccion
+        -String galeria
+    }
+    class Categoria {
+        -Long id
+        -String nombre
+        -String descripcion
+        +setCategoriaPadre(Categoria) void
+        +agregarProducto(ProductoItem) void
+    }
+    class Marca {
+        -Long id
+        -String nombre
+    }
+    class ProductoItem {
+        -Long id
+        -String nombre
+        -String descripcion
+        -boolean activo
+        +agregarVariante(VarianteSKU) void
+    }
+    class VarianteSKU {
+        -Long id
+        -String sku
+        -String codigoBarras
+        -String talla
+        -String color
+        -BigDecimal precioCompra
+        -BigDecimal precioVenta
+        -Integer stockMinimo
+        +calcularStock() int
+        +registrarMovimiento(MovimientoInventario) void
+        +resolverStockMinimo(ParametrosStock) int
+        +requiereReabastecimiento(ParametrosStock) boolean
+        +agregarAlerta(AlertaReabastecimiento) void
+    }
+
+    %% ========== INVENTARIO ==========
+    class MovimientoInventario {
+        -Long id
+        -TipoMovimiento tipo
+        -int cantidad
+        -LocalDateTime fecha
+        -String motivo
+        +calcularEfecto() int
+    }
+    class AlertaReabastecimiento {
+        -Long id
+        -LocalDateTime fechaGeneracion
+        -int stockActual
+        -int stockMinimo
+        -String mensaje
+        -EstadoAlerta estado
+        +marcarVista() void
+        +marcarAtendida() void
+    }
+
+    %% ========== COMPRAS ==========
+    class Compra {
+        -Long id
+        -LocalDateTime fecha
+        -BigDecimal total
+        +agregarDetalle(DetalleCompra) void
+    }
+    class DetalleCompra {
+        -Long id
+        -int cantidad
+        -BigDecimal costoUnitario
+        +calcularSubtotal() BigDecimal
+    }
+
+    %% ========== VENTAS ==========
+    class VentaPunto {
+        -Long id
+        -LocalDateTime fecha
+        -BigDecimal total
+        -MedioPago medioPago
+        +agregarDetalle(DetalleVenta) void
+    }
+    class DetalleVenta {
+        -Long id
+        -int cantidad
+        -BigDecimal precioUnitario
+        +calcularSubtotal() BigDecimal
+    }
+    class Cliente {
+        -Long id
+        -String nombre
+        -String celular
+        -String documento
+    }
+
+    %% ========== SUSCRIPCION ==========
+    class PlanSuscripcion {
+        -Long id
+        -String nombre
+        -BigDecimal precioMensual
+        -int limiteProductos
+    }
+    class Suscripcion {
+        -Long id
+        -LocalDate fechaInicio
+        -LocalDate fechaFin
+        -EstadoSuscripcion estado
+        +estaVigente(LocalDate) boolean
+        +activar() void
+        +cancelar() void
+    }
+
+    %% ========== ENUMS ==========
+    class TipoMovimiento {
+        <<enumeration>>
+        COMPRA
+        VENTA
+        DEVOLUCION_CLIENTE
+        AJUSTE_POSITIVO
+        AJUSTE_NEGATIVO
+        +getSigno() int
+    }
+    class EstadoAlerta {
+        <<enumeration>>
+        PENDIENTE
+        VISTA
+        ATENDIDA
+    }
+    class EstadoSuscripcion {
+        <<enumeration>>
+        PRUEBA
+        ACTIVA
+        VENCIDA
+        CANCELADA
+    }
+    class MedioPago {
+        <<enumeration>>
+        EFECTIVO
+        YAPE
+        PLIN
+        TARJETA
+        TRANSFERENCIA
+    }
+
+    %% ========== INTERFAZ Y SINGLETON (configuracion, no es de dominio) ==========
+    class ParametrosStock {
+        <<interface>>
+        +getStockMinimoPorDefecto() int
+    }
+    class ConfiguracionTienda {
+        <<Singleton>>
+        -ConfiguracionTienda instancia$
+        -String moneda
+        -BigDecimal igv
+        -int stockMinimoPorDefecto
+        -ConfiguracionTienda()
+        +getInstance() ConfiguracionTienda$
+        +getStockMinimoPorDefecto() int
+    }
+
+    %% Supuesto: Categoria y Marca son un catalogo global compartido (sin dueno).
+    %% Regla (service, Etapa 2): una venta o compra solo usa variantes cuyo
+    %% producto pertenezca a la misma tienda.
+    %% Cardinalidad minima 1..* en composiciones: se valida en el service (Etapa 2).
+
+    %% ========== RELACIONES ==========
+    %% Herencia
+    Usuario <|-- Comerciante
+    Usuario <|-- ProveedorMayorista
+
+    %% Agregacion
+    Comerciante o-- Tienda : administra
+    Categoria o-- ProductoItem : agrupa
+
+    %% Composicion
+    ProductoItem "1" *-- "1..*" VarianteSKU : se presenta en
+    VentaPunto "1" *-- "1..*" DetalleVenta : contiene
+    Compra "1" *-- "1..*" DetalleCompra : contiene
+
+    %% Asociacion
+    Categoria "0..*" --> "0..1" Categoria : categoria padre
+    ProductoItem "0..*" --> "0..1" Marca : de la marca
+    ProductoItem "0..*" --> "1" Tienda : pertenece a
+    VentaPunto "0..*" --> "1" Tienda : se registra en
+    Compra "0..*" --> "1" Tienda : se registra en
+    Cliente "0..*" --> "1" Tienda : es cliente de
+    VarianteSKU "1" --> "0..*" MovimientoInventario : registra
+    VarianteSKU "1" --> "0..*" AlertaReabastecimiento : genera
+    DetalleVenta "0..*" --> "1" VarianteSKU : vende
+    DetalleCompra "0..*" --> "1" VarianteSKU : abastece
+    MovimientoInventario "0..1" --> "0..1" DetalleVenta : origen venta
+    MovimientoInventario "0..1" --> "0..1" DetalleCompra : origen compra
+    Compra "0..*" --> "1" ProveedorMayorista : abastecida por
+    VentaPunto "0..*" --> "0..1" Cliente : atiende a
+    Comerciante "1" --> "0..*" Suscripcion : contrata
+    Suscripcion "0..*" --> "1" PlanSuscripcion : sobre el plan
+
+    %% Dependencia
+    VarianteSKU ..> ParametrosStock : usa como parametro
+    ConfiguracionTienda ..|> ParametrosStock : implementa
+    MovimientoInventario ..> TipoMovimiento
+    AlertaReabastecimiento ..> EstadoAlerta
+    VentaPunto ..> MedioPago
+    Suscripcion ..> EstadoSuscripcion

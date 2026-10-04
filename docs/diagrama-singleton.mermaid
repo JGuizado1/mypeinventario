@@ -1,0 +1,30 @@
+classDiagram
+    direction LR
+
+    class ParametrosStock {
+        <<interface>>
+        +getStockMinimoPorDefecto() int
+    }
+    class ConfiguracionTienda {
+        <<Singleton>>
+        -ConfiguracionTienda instancia$
+        -String moneda
+        -BigDecimal igv
+        -int stockMinimoPorDefecto
+        -ConfiguracionTienda()
+        +getInstance() ConfiguracionTienda$
+        +getMoneda() String
+        +getIgv() BigDecimal
+        +getStockMinimoPorDefecto() int
+        +setMoneda(String) void
+        +setIgv(BigDecimal) void
+        +setStockMinimoPorDefecto(int) void
+    }
+    class VarianteSKU {
+        +resolverStockMinimo(ParametrosStock) int
+        +requiereReabastecimiento(ParametrosStock) boolean
+    }
+
+    ConfiguracionTienda ..|> ParametrosStock : implementa
+    ConfiguracionTienda --> ConfiguracionTienda : instancia unica
+    VarianteSKU ..> ParametrosStock : usa como parametro
