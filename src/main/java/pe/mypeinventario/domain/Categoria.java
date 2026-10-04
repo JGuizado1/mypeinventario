@@ -1,0 +1,70 @@
+package pe.mypeinventario.domain;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Categoría de productos (por ejemplo, "Calzado" o "Zapatillas"). Puede tener una
+ * categoría padre y agrupa productos mediante agregación: los productos existen
+ * aunque la categoría desaparezca. Es un catálogo global compartido entre tiendas.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+public class Categoria {
+
+    private Long id;
+    private String nombre;
+    private String descripcion;
+    private Categoria categoriaPadre;
+
+    @Setter(AccessLevel.NONE)
+    private List<ProductoItem> productos = new ArrayList<>();
+
+    public Categoria(Long id, String nombre, String descripcion, Categoria categoriaPadre) {
+        this.id = id;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        setCategoriaPadre(categoriaPadre);
+    }
+
+    /**
+     * Asigna la categoría padre.
+     *
+     * @param categoriaPadre la categoría padre, o {@code null} si es una categoría raíz
+     * @throws IllegalArgumentException si se intenta ser padre de sí misma
+     */
+    public void setCategoriaPadre(Categoria categoriaPadre) {
+        if (categoriaPadre == this) {
+            throw new IllegalArgumentException("Una categoría no puede ser su propia padre");
+        }
+        this.categoriaPadre = categoriaPadre;
+    }
+
+    /** @return vista de solo lectura de los productos de esta categoría */
+    public List<ProductoItem> getProductos() {
+        return Collections.unmodifiableList(productos);
+    }
+
+    /**
+     * Agrega un producto a la categoría y mantiene sincronizado el lado inverso
+     * ({@link ProductoItem#getCategoria()}).
+     *
+     * @param producto producto a agrupar
+     * @throws IllegalArgumentException si el producto es nulo
+     */
+    public void agregarProducto(ProductoItem producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("El producto no puede ser nulo");
+        }
+        if (!productos.contains(producto)) {
+            productos.add(producto);
+        }
+        producto.setCategoria(this);
+    }
+}
