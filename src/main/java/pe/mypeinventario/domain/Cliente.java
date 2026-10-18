@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /** Cliente final de una {@link Tienda}, usado para ventas frecuentes o con seguimiento. */
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor

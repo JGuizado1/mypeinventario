@@ -1,9 +1,12 @@
 package pe.mypeinventario.domain;
 
 import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 /**
  * Registro histórico de una entrada o salida de stock de una {@link VarianteSKU}.
@@ -11,20 +14,32 @@ import lombok.NoArgsConstructor;
  * historial sea una traza confiable. Para corregir un error se registra un
  * nuevo movimiento de ajuste.
  */
+@Entity
+@Immutable
 @Getter
 // JPA (Etapa 2): el constructor protegido sin argumentos será el que use Hibernate.
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MovimientoInventario {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 25)
     private TipoMovimiento tipo;
     /** Siempre positiva; el signo lo aporta {@link TipoMovimiento#getSigno()}. */
+    @Column(nullable = false)
     private int cantidad;
+    @Column(nullable = false)
     private LocalDateTime fecha;
     private String motivo;
     /** Línea de venta que originó el movimiento (puede ser {@code null}). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "detalle_venta_id")
     private DetalleVenta detalleVenta;
     /** Línea de compra que originó el movimiento (puede ser {@code null}). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "detalle_compra_id")
     private DetalleCompra detalleCompra;
 
     /**

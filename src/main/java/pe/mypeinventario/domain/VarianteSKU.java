@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,25 +17,38 @@ import pe.mypeinventario.config.ParametrosStock;
  * {@link ProductoItem}. Su stock no se guarda: se deriva de la suma de sus
  * {@link MovimientoInventario}, que solo se agregan y nunca se editan.
  */
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 public class VarianteSKU {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 50)
     private String sku;
+    @Column(length = 30)
     private String codigoBarras;
+    @Column(length = 20)
     private String talla;
+    @Column(length = 30)
     private String color;
+    @Column(precision = 12, scale = 2)
     private BigDecimal precioCompra;
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal precioVenta;
     /** Stock mínimo propio; si es {@code null} se usa el valor por defecto de la tienda. */
     private Integer stockMinimo;
 
     @Setter(AccessLevel.NONE)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "variante_id", nullable = false)
     private List<MovimientoInventario> movimientos = new ArrayList<>();
 
     @Setter(AccessLevel.NONE)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "variante_id", nullable = false)
     private List<AlertaReabastecimiento> alertas = new ArrayList<>();
 
     public VarianteSKU(Long id, String sku, String codigoBarras, String talla, String color,
