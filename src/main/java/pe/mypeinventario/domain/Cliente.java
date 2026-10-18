@@ -1,5 +1,6 @@
 package pe.mypeinventario.domain;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,11 +10,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Cliente {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
     private String celular;
     private String documento;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tienda_id")
     private Tienda tienda;
 
     /**

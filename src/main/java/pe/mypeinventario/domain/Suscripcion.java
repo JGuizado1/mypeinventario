@@ -1,6 +1,8 @@
 package pe.mypeinventario.domain;
 
 import java.time.LocalDate;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +11,20 @@ import lombok.NoArgsConstructor;
  * Suscripción de un {@link Comerciante} a un {@link PlanSuscripcion}. Empieza en
  * período de prueba gratuita y puede activarse o cancelarse.
  */
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Suscripcion {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "plan_id")
     private PlanSuscripcion plan;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private EstadoSuscripcion estado;
 
     /**
