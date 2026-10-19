@@ -3,6 +3,8 @@ package pe.mypeinventario.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,17 +15,24 @@ import lombok.Setter;
  * categoría padre y agrupa productos mediante agregación: los productos existen
  * aunque la categoría desaparezca. Es un catálogo global compartido entre tiendas.
  */
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 public class Categoria {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 80)
     private String nombre;
     private String descripcion;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_padre_id")
     private Categoria categoriaPadre;
 
     @Setter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "categoria")
     private List<ProductoItem> productos = new ArrayList<>();
 
     public Categoria(Long id, String nombre, String descripcion, Categoria categoriaPadre) {

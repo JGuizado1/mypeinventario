@@ -1,0 +1,47 @@
+classDiagram
+    direction LR
+
+    class CreadorMovimiento {
+        <<abstract>>
+        -Clock reloj
+        +crear(OrigenMovimiento, int, String) MovimientoInventario*
+        #construir(TipoMovimiento, int, String, OrigenMovimiento) MovimientoInventario
+    }
+    class CreadorMovimientoCompra {
+        +crear(...) MovimientoInventario
+    }
+    class CreadorMovimientoVenta {
+        +crear(...) MovimientoInventario
+    }
+    class CreadorMovimientoDevolucion {
+        +crear(...) MovimientoInventario
+    }
+    class CreadorMovimientoAjuste {
+        -TipoMovimiento tipo
+        +crear(...) MovimientoInventario
+    }
+    class OrigenMovimiento {
+        <<record>>
+        -DetalleVenta detalleVenta
+        -DetalleCompra detalleCompra
+        +deVenta(DetalleVenta) OrigenMovimiento$
+        +deCompra(DetalleCompra) OrigenMovimiento$
+        +ninguno() OrigenMovimiento$
+    }
+    class MovimientoInventario {
+        -TipoMovimiento tipo
+        -int cantidad
+        -String motivo
+        +calcularEfecto() int
+    }
+
+    CreadorMovimiento <|-- CreadorMovimientoCompra
+    CreadorMovimiento <|-- CreadorMovimientoVenta
+    CreadorMovimiento <|-- CreadorMovimientoDevolucion
+    CreadorMovimiento <|-- CreadorMovimientoAjuste
+    CreadorMovimiento ..> MovimientoInventario : crea
+    CreadorMovimiento ..> OrigenMovimiento : recibe
+    OrigenMovimiento --> "0..1" DetalleVenta
+    OrigenMovimiento --> "0..1" DetalleCompra
+    MovimientoInventario ..> TipoMovimiento
+    CreadorMovimientoAjuste ..> TipoMovimiento

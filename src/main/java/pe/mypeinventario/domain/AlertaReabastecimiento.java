@@ -1,6 +1,8 @@
 package pe.mypeinventario.domain;
 
 import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,15 +11,20 @@ import lombok.NoArgsConstructor;
  * Aviso de que una {@link VarianteSKU} alcanzó o bajó de su stock mínimo.
  * Tiene un ciclo de vida: PENDIENTE, VISTA y ATENDIDA.
  */
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AlertaReabastecimiento {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private LocalDateTime fechaGeneracion;
     private int stockActual;
     private int stockMinimo;
     private String mensaje;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 15)
     private EstadoAlerta estado;
 
     /**

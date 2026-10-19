@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,17 +16,31 @@ import lombok.NoArgsConstructor;
  * composición con sus {@link DetalleVenta}. El {@link Cliente} es opcional
  * porque muchas ventas de mostrador son anónimas.
  */
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VentaPunto {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private LocalDateTime fecha;
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal total = BigDecimal.ZERO;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private MedioPago medioPago;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tienda_id")
     private Tienda tienda;
     /** Opcional (0..1). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+    /** Composición: las líneas viven y mueren con la venta. */
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "venta_id", nullable = false)
     private List<DetalleVenta> detalles = new ArrayList<>();
 
     /**

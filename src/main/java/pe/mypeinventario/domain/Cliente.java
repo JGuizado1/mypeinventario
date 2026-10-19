@@ -1,19 +1,24 @@
 package pe.mypeinventario.domain;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /** Cliente final de una {@link Tienda}, usado para ventas frecuentes o con seguimiento. */
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 public class Cliente {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
     private String celular;
     private String documento;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tienda_id")
     private Tienda tienda;
 
     /**

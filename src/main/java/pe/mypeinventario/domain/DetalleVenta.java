@@ -1,6 +1,8 @@
 package pe.mypeinventario.domain;
 
 import java.math.BigDecimal;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,13 +11,19 @@ import lombok.NoArgsConstructor;
  * Línea de una {@link VentaPunto}. Guarda el precio unitario del momento de la
  * venta, de modo que un cambio posterior de precio no altere ventas pasadas.
  */
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DetalleVenta {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "variante_id")
     private VarianteSKU variante;
     private int cantidad;
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal precioUnitario;
 
     /**
