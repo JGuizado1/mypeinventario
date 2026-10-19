@@ -14,4 +14,9 @@ public class ParametrosStockConfig {
     public ParametrosStock parametrosStock() {
         return ConfiguracionTienda.getInstance();
     }
+
+    @Bean
+    public ParametrosTributarios parametrosTributarios() {
+        return ConfiguracionTienda.getInstance();
+    }
 }

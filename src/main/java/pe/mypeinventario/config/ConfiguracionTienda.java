@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * Implementa el patrón Singleton de forma thread-safe mediante
  * double-checked locking: existe una única instancia en toda la aplicación.
  */
-public final class ConfiguracionTienda implements ParametrosStock {
+public final class ConfiguracionTienda implements ParametrosStock, ParametrosTributarios {
 
     private static final String MONEDA_POR_DEFECTO = "PEN";
     private static final BigDecimal IGV_POR_DEFECTO = new BigDecimal("0.18");
@@ -60,7 +60,7 @@ public final class ConfiguracionTienda implements ParametrosStock {
         }
         this.moneda = moneda;
     }
-
+    @Override
     public BigDecimal getIgv() {
         return igv;
     }
