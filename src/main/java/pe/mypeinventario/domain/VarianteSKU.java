@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pe.mypeinventario.config.ParametrosStock;
+import pe.mypeinventario.exception.StockInsuficienteException;
 
 /**
  * Unidad mínima de inventario: una combinación de talla y color de un
@@ -92,16 +93,16 @@ public class VarianteSKU {
      *
      * @param movimiento movimiento a registrar
      * @throws IllegalArgumentException si el movimiento es nulo
-     * @throws IllegalStateException    si la salida supera el stock disponible
+     * @throws StockInsuficienteException si la salida supera el stock disponible
      */
     public void registrarMovimiento(MovimientoInventario movimiento) {
         if (movimiento == null) {
             throw new IllegalArgumentException("El movimiento no puede ser nulo");
         }
-        int stockResultante = calcularStock() + movimiento.calcularEfecto();
+        int stockActual = calcularStock();
+        int stockResultante = stockActual + movimiento.calcularEfecto();
         if (stockResultante < 0) {
-            throw new IllegalStateException(
-                    "Stock insuficiente para la variante " + sku + ": quedaría en " + stockResultante);
+            throw new StockInsuficienteException(sku, stockActual, -movimiento.calcularEfecto());
         }
         movimientos.add(movimiento);
     }
