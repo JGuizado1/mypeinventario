@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * Spring solo conserva una referencia: la instancia única sigue siendo la del patrón.
  */
 @Configuration(proxyBeanMethods = false)
-public class ParametrosStockConfig {
+public class ConfiguracionTiendaBeans {
 
     @Bean
     public ParametrosStock parametrosStock() {
