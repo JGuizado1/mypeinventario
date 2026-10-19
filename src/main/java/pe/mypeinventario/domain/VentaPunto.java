@@ -1,12 +1,11 @@
 package pe.mypeinventario.domain;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +14,10 @@ import lombok.NoArgsConstructor;
  * Venta realizada en el punto de venta de una {@link Tienda}. Mantiene una
  * composición con sus {@link DetalleVenta}. El {@link Cliente} es opcional
  * porque muchas ventas de mostrador son anónimas.
+ * <p>
+ * Los precios incluyen IGV: el subtotal es la suma de las líneas, el total es
+ * lo que paga el cliente después de descuentos, y el IGV es la parte del total
+ * que corresponde al impuesto.
  */
 @Entity
 @Getter
@@ -24,20 +27,39 @@ public class VentaPunto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private LocalDateTime fecha;
+
+    /** Suma de las líneas, antes de descuentos. */
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal subtotal = BigDecimal.ZERO;
+
+    /** Descuento total aplicado (subtotal menos total). */
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal descuento = BigDecimal.ZERO;
+
+    /** Lo que paga el cliente. */
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal total = BigDecimal.ZERO;
+
+    /** IGV contenido en el total. */
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal igv = BigDecimal.ZERO;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private MedioPago medioPago;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tienda_id")
     private Tienda tienda;
-    /** Opcional (0..1). */
+
+    /** Opcional (0..1): las ventas de mostrador pueden ser anónimas. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
     /** Composición: las líneas viven y mueren con la venta. */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "venta_id", nullable = false)
@@ -68,8 +90,9 @@ public class VentaPunto {
     }
 
     /**
-     * Agrega una línea a la venta y actualiza el total (suma simple; los descuentos
-     * e IGV se tratarán en la Etapa 2).
+     * Agrega una línea y recalcula el subtotal. Mientras no se aplique un importe
+     * final, el total es igual al subtotal; si ya había un descuento aplicado, se
+     * descarta y debe aplicarse de nuevo.
      *
      * @param detalle línea a agregar
      * @throws IllegalArgumentException si el detalle es nulo
@@ -79,6 +102,32 @@ public class VentaPunto {
             throw new IllegalArgumentException("El detalle no puede ser nulo");
         }
         detalles.add(detalle);
-        total = total.add(detalle.calcularSubtotal());
+        subtotal = subtotal.add(detalle.calcularSubtotal());
+        total = subtotal;
+        descuento = BigDecimal.ZERO;
+        igv = BigDecimal.ZERO;
+    }
+
+    /**
+     * Fija el importe final tras aplicar descuentos. El descuento queda como la
+     * diferencia entre el subtotal y el total.
+     *
+     * @param totalFinal   lo que paga el cliente, entre 0 y el subtotal
+     * @param igvIncluido  IGV contenido en el total, entre 0 y el total
+     * @throws IllegalArgumentException si algún valor es nulo o está fuera de rango
+     */
+    public void aplicarImporteFinal(BigDecimal totalFinal, BigDecimal igvIncluido) {
+        if (totalFinal == null || igvIncluido == null) {
+            throw new IllegalArgumentException("El total y el IGV son obligatorios");
+        }
+        if (totalFinal.signum() < 0 || totalFinal.compareTo(subtotal) > 0) {
+            throw new IllegalArgumentException("El total final debe estar entre 0 y el subtotal");
+        }
+        if (igvIncluido.signum() < 0 || igvIncluido.compareTo(totalFinal) > 0) {
+            throw new IllegalArgumentException("El IGV debe estar entre 0 y el total");
+        }
+        this.descuento = subtotal.subtract(totalFinal);
+        this.total = totalFinal;
+        this.igv = igvIncluido;
     }
 }
