@@ -14,6 +14,9 @@ import pe.mypeinventario.repository.AlertaReabastecimientoRepository;
 import pe.mypeinventario.repository.VarianteSKURepository;
 import pe.mypeinventario.service.InventarioService;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import pe.mypeinventario.exception.ConflictoConcurrenciaException;
+
 /** Implementación de {@link InventarioService}. */
 @Service
 public class InventarioServiceImpl implements InventarioService {
@@ -41,12 +44,15 @@ public class InventarioServiceImpl implements InventarioService {
         }
         VarianteSKU variante = varianteRepository.findById(varianteId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Variante", varianteId));
-
-        variante.registrarMovimiento(movimiento);
-        // flush (y no save): la variante ya está gestionada, y así se persiste esta misma
-        // instancia del movimiento, que queda con su identificador.
-        varianteRepository.flush();
-        actualizarAlertas(variante);
+        try {
+            variante.registrarMovimiento(movimiento);
+            // flush (y no save): persiste esta misma instancia del movimiento, con su identificador.
+            varianteRepository.flush();
+            actualizarAlertas(variante);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw new ConflictoConcurrenciaException("La variante " + variante.getSku()
+                    + " fue modificada por otra operación; vuelva a intentarlo", e);
+        }
         return movimiento;
     }
 

@@ -61,10 +61,10 @@ public class Categoria {
     }
 
     /**
-     * Agrega un producto a la categoría y mantiene sincronizado el lado inverso
-     * ({@link ProductoItem#getCategoria()}).
+     * Agrega un producto a la categoría y mantiene sincronizada la relación
+     * inversa mediante el atributo categoria de {@link ProductoItem}.
      *
-     * @param producto producto a agrupar
+     * @param producto producto que se desea asociar a esta categoría
      * @throws IllegalArgumentException si el producto es nulo
      */
     public void agregarProducto(ProductoItem producto) {

@@ -5,6 +5,7 @@ import pe.mypeinventario.domain.MovimientoInventario;
 import pe.mypeinventario.exception.OperacionInvalidaException;
 import pe.mypeinventario.exception.RecursoNoEncontradoException;
 import pe.mypeinventario.exception.StockInsuficienteException;
+import pe.mypeinventario.exception.ConflictoConcurrenciaException;
 
 /**
  * Operaciones que modifican el inventario: registrar movimientos y gestionar
@@ -23,6 +24,7 @@ public interface InventarioService {
      * @throws RecursoNoEncontradoException si la variante no existe
      * @throws StockInsuficienteException   si es una salida mayor al stock disponible
      * @throws OperacionInvalidaException   si el movimiento es nulo
+     * @throws ConflictoConcurrenciaException si otra operación modificó la variante al mismo tiempo
      */
     MovimientoInventario registrarMovimiento(Long varianteId, MovimientoInventario movimiento);
 
