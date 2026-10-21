@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import pe.mypeinventario.domain.MovimientoInventario;
+import pe.mypeinventario.domain.TipoMovimiento;
 
 import java.util.List;
 /**
@@ -24,4 +25,19 @@ public interface MovimientoInventarioRepository extends Repository<MovimientoInv
             order by m.fecha desc
             """)
     List<MovimientoInventario> listarPorVariante(@Param("varianteId") Long varianteId);
+
+    /**
+     * Suma las unidades de los movimientos de un tipo ligados a una línea de venta.
+     * Sirve, por ejemplo, para saber cuántas unidades de una línea ya se devolvieron.
+     *
+     * @param detalleVentaId identificador de la línea de venta
+     * @param tipo           tipo de movimiento a sumar
+     * @return unidades acumuladas, 0 si no hay movimientos
+     */
+    @Query("""
+            select coalesce(sum(m.cantidad), 0L) from MovimientoInventario m
+            where m.detalleVenta.id = :detalleVentaId and m.tipo = :tipo
+            """)
+    long sumarCantidadPorDetalleVenta(@Param("detalleVentaId") Long detalleVentaId,
+                                      @Param("tipo") TipoMovimiento tipo);
 }

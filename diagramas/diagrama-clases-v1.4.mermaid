@@ -99,9 +99,13 @@ classDiagram
     class VentaPunto {
         -Long id
         -LocalDateTime fecha
+        -BigDecimal subtotal
+        -BigDecimal descuento
         -BigDecimal total
+        -BigDecimal igv
         -MedioPago medioPago
         +agregarDetalle(DetalleVenta) void
+        +aplicarImporteFinal(BigDecimal, BigDecimal) void
     }
     class DetalleVenta {
         -Long id
@@ -142,6 +146,7 @@ classDiagram
         AJUSTE_POSITIVO
         AJUSTE_NEGATIVO
         +getSigno() int
+        +entradas() List~TipoMovimiento~$
     }
     class EstadoAlerta {
         <<enumeration>>
@@ -170,6 +175,10 @@ classDiagram
         <<interface>>
         +getStockMinimoPorDefecto() int
     }
+    class ParametrosTributarios {
+        <<interface>>
+        +getIgv() BigDecimal
+    }
     class ConfiguracionTienda {
         <<Singleton>>
         -ConfiguracionTienda instancia$
@@ -179,6 +188,7 @@ classDiagram
         -ConfiguracionTienda()
         +getInstance() ConfiguracionTienda$
         +getStockMinimoPorDefecto() int
+        +getIgv() BigDecimal
     }
 
     %% Supuesto: Categoria y Marca son un catalogo global compartido (sin dueno).
@@ -192,8 +202,8 @@ classDiagram
     Usuario <|-- ProveedorMayorista
 
     %% Agregacion
-    Comerciante o-- Tienda : administra
-    Categoria o-- ProductoItem : agrupa
+    Comerciante "1" o-- "1..*" Tienda : administra
+    Categoria "1" o-- "0..*" ProductoItem : agrupa
 
     %% Composicion
     ProductoItem "1" *-- "1..*" VarianteSKU : se presenta en
@@ -221,6 +231,7 @@ classDiagram
     %% Dependencia
     VarianteSKU ..> ParametrosStock : usa como parametro
     ConfiguracionTienda ..|> ParametrosStock : implementa
+    ConfiguracionTienda ..|> ParametrosTributarios : implementa
     MovimientoInventario ..> TipoMovimiento
     AlertaReabastecimiento ..> EstadoAlerta
     VentaPunto ..> MedioPago

@@ -52,6 +52,11 @@ public class VarianteSKU {
     @JoinColumn(name = "variante_id", nullable = false)
     private List<AlertaReabastecimiento> alertas = new ArrayList<>();
 
+    /** Versión para bloqueo optimista: sube con cada cambio, incluido un nuevo movimiento. */
+    @Version
+    @Setter(AccessLevel.NONE)
+    private Long version;
+
     public VarianteSKU(Long id, String sku, String codigoBarras, String talla, String color,
                        BigDecimal precioCompra, BigDecimal precioVenta, Integer stockMinimo) {
         this.id = id;

@@ -1,0 +1,33 @@
+classDiagram
+    direction TB
+
+    class CalculoImporte {
+        <<interface>>
+        +importe() BigDecimal
+        +descripcion() String
+    }
+    class ImporteBase {
+        -BigDecimal subtotal
+        +importe() BigDecimal
+        +descripcion() String
+    }
+    class DecoradorImporte {
+        <<abstract>>
+        #CalculoImporte envuelto
+    }
+    class DescuentoPorcentual {
+        -BigDecimal porcentaje
+        +importe() BigDecimal
+        +descripcion() String
+    }
+    class DescuentoMontoFijo {
+        -BigDecimal monto
+        +importe() BigDecimal
+        +descripcion() String
+    }
+
+    CalculoImporte <|.. ImporteBase
+    CalculoImporte <|.. DecoradorImporte
+    DecoradorImporte <|-- DescuentoPorcentual
+    DecoradorImporte <|-- DescuentoMontoFijo
+    DecoradorImporte --> "1" CalculoImporte : envuelve

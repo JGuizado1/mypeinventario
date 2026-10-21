@@ -1,4 +1,4 @@
-package pe.mypeinventario.config;
+package pe.mypeinventario.infraestructura;
 
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
