@@ -6,6 +6,8 @@ import pe.mypeinventario.exception.OperacionInvalidaException;
 import pe.mypeinventario.exception.RecursoNoEncontradoException;
 import pe.mypeinventario.reporte.ProductoVendido;
 import pe.mypeinventario.reporte.ResumenVentas;
+import pe.mypeinventario.composite.NodoVentasCategoria;
+import pe.mypeinventario.reporte.VarianteSinRotacion;
 
 /** Reportes de rotación y rentabilidad. Son de solo lectura. */
 public interface ReporteService {
@@ -34,4 +36,29 @@ public interface ReporteService {
      * @throws OperacionInvalidaException   si el periodo es inválido
      */
     ResumenVentas obtenerResumen(Long tiendaId, LocalDate desde, LocalDate hasta);
+
+    /**
+     * Lista las variantes con stock que no se venden hace tiempo, para decidir qué rematar
+     * o dejar de comprar.
+     *
+     * @param tiendaId tienda consultada
+     * @param dias     días sin ventas para considerar parada una variante, entre 1 y 3650
+     * @return variantes paradas: primero las nunca vendidas y luego las de venta más antigua
+     * @throws RecursoNoEncontradoException si la tienda no existe
+     * @throws OperacionInvalidaException   si los datos son inválidos
+     */
+    List<VarianteSinRotacion> obtenerSinRotacion(Long tiendaId, int dias);
+
+    /**
+     * Calcula ventas, costo y utilidad por categoría. Cada categoría incluye lo vendido en
+     * sus subcategorías. Solo aparecen las categorías con ventas en el periodo.
+     *
+     * @param tiendaId tienda consultada
+     * @param desde    primer día del periodo (incluido)
+     * @param hasta    último día del periodo (incluido)
+     * @return las categorías raíz con ventas, cada una con su árbol de subcategorías
+     * @throws RecursoNoEncontradoException si la tienda no existe
+     * @throws OperacionInvalidaException   si el periodo es inválido
+     */
+    List<NodoVentasCategoria> obtenerVentasPorCategoria(Long tiendaId, LocalDate desde, LocalDate hasta);
 }

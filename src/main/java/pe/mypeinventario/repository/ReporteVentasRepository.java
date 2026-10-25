@@ -1,5 +1,7 @@
 package pe.mypeinventario.repository;
 
+import java.util.Collection;
+import pe.mypeinventario.domain.TipoMovimiento;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -72,4 +74,40 @@ public interface ReporteVentasRepository extends Repository<VentaPunto, Long> {
     long contarLineasSinCosto(@Param("tiendaId") Long tiendaId,
                               @Param("desde") LocalDateTime desde,
                               @Param("hasta") LocalDateTime hasta);
+
+    /**
+     * Variantes de productos activos con stock mayor que cero cuya última venta es anterior
+     * al límite, o que nunca se vendieron. Cada fila trae, en este orden: id, sku, producto,
+     * talla, color, costo, stock y fecha de la última venta (puede ser nula).
+     */
+    @Query("""
+            select v.id, v.sku, p.nombre, v.talla, v.color, v.precioCompra,
+                   sum(case when m.tipo in :entradas then m.cantidad else -m.cantidad end),
+                   max(case when m.tipo = :tipoVenta then m.fecha else null end)
+            from ProductoItem p join p.variantes v join v.movimientos m
+            where p.tienda.id = :tiendaId and p.activo = true
+            group by v.id, v.sku, p.nombre, v.talla, v.color, v.precioCompra
+            having sum(case when m.tipo in :entradas then m.cantidad else -m.cantidad end) > 0
+               and (max(case when m.tipo = :tipoVenta then m.fecha else null end) is null
+                    or max(case when m.tipo = :tipoVenta then m.fecha else null end) < :limite)
+            """)
+    List<Object[]> variantesConStockSinVentasDesde(@Param("tiendaId") Long tiendaId,
+                                                   @Param("entradas") Collection<TipoMovimiento> entradas,
+                                                   @Param("tipoVenta") TipoMovimiento tipoVenta,
+                                                   @Param("limite") LocalDateTime limite);
+
+    /**
+     * Ventas del periodo agrupadas por la categoría directa del producto. Cada fila trae:
+     * id de la categoría, unidades, ingresos y costo (el costo solo suma líneas con costo conocido).
+     */
+    @Query("""
+            select c.id, sum(d.cantidad), sum(d.cantidad * d.precioUnitario), sum(d.cantidad * d.costoUnitario)
+            from VentaPunto vp join vp.detalles d join d.variante v, ProductoItem p join p.variantes pv join p.categoria c
+            where pv.id = v.id and vp.tienda.id = :tiendaId
+              and vp.fecha >= :desde and vp.fecha < :hasta
+            group by c.id
+            """)
+    List<Object[]> ventasPorCategoria(@Param("tiendaId") Long tiendaId,
+                                      @Param("desde") LocalDateTime desde,
+                                      @Param("hasta") LocalDateTime hasta);
 }
