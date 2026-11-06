@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Categorías y marcas')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('catalogo')}"></aside>
+    <main class="contenido">
+        <h1>Categorías y marcas</h1>
+        <p class="ayuda">Son compartidas por todas tus tiendas. Los productos se agrupan en categorías y pueden tener una marca.</p>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+
+        <h2 class="separado">Categorías</h2>
+        <p class="vacio" th:if="${#lists.isEmpty(categorias)}">Aún no hay categorías. Crea la primera abajo.</p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(categorias)}">
+            <table class="tabla">
+                <thead>
+                <tr><th scope="col">Categoría</th><th scope="col">Dentro de</th><th scope="col">Descripción</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${categorias}">
+                    <td th:text="${c.nombre}">Polos</td>
+                    <td th:text="${c.padre != null} ? ${c.padre} : '—'">Ropa</td>
+                    <td th:text="${c.descripcion != null} ? ${c.descripcion} : '—'">Polos de algodón</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form method="post" th:action="@{/catalogo/categorias}">
+            <fieldset class="grupo">
+                <legend>Nueva categoría</legend>
+                <p class="error" role="alert" th:if="${errorCategoria}" th:text="${errorCategoria}">Error</p>
+                <div class="rejilla">
+                    <div class="campo">
+                        <label for="nombreCategoria">Nombre</label>
+                        <input id="nombreCategoria" name="nombre" type="text" required th:value="${nombreCategoria}">
+                    </div>
+                    <div class="campo">
+                        <label for="padreId">Dentro de (opcional)</label>
+                        <select id="padreId" name="padreId">
+                            <option value="">Ninguna, es una categoría principal</option>
+                            <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nombre}">Ropa</option>
+                        </select>
+                    </div>
+                    <div class="campo ancho">
+                        <label for="descripcionCategoria">Descripción (opcional)</label>
+                        <input id="descripcionCategoria" name="descripcion" type="text"
+                               th:value="${descripcionCategoria}">
+                    </div>
+                </div>
+                <button class="btn btn-principal" type="submit">Crear categoría</button>
+            </fieldset>
+        </form>
+
+        <h2 class="separado">Marcas</h2>
+        <p class="vacio" th:if="${#lists.isEmpty(marcas)}">Aún no hay marcas. Crea la primera abajo.</p>
+        <ul class="lista-simple" th:unless="${#lists.isEmpty(marcas)}">
+            <li th:each="m : ${marcas}" th:text="${m.nombre}">Gamarra Style</li>
+        </ul>
+
+        <form method="post" th:action="@{/catalogo/marcas}">
+            <fieldset class="grupo">
+                <legend>Nueva marca</legend>
+                <p class="error" role="alert" th:if="${errorMarca}" th:text="${errorMarca}">Error</p>
+                <div class="rejilla">
+                    <div class="campo">
+                        <label for="nombreMarca">Nombre</label>
+                        <input id="nombreMarca" name="nombre" type="text" required th:value="${nombreMarca}">
+                    </div>
+                </div>
+                <button class="btn btn-principal" type="submit">Crear marca</button>
+            </fieldset>
+        </form>
+    </main>
+</div>
+</body>
+</html>

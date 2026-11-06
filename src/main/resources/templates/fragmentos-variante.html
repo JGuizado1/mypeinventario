@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Campos de una variante. Se usa en "Nuevo producto" y en "Agregar variante"; el modelo trae "form". -->
+<div class="rejilla" th:fragment="campos">
+    <div class="campo">
+        <label for="sku">SKU (código interno)</label>
+        <input id="sku" name="sku" type="text" required th:value="${form.sku}">
+    </div>
+    <div class="campo">
+        <label for="codigoBarras">Código de barras (opcional)</label>
+        <input id="codigoBarras" name="codigoBarras" type="text" th:value="${form.codigoBarras}">
+    </div>
+    <div class="campo">
+        <label for="talla">Talla (opcional)</label>
+        <input id="talla" name="talla" type="text" th:value="${form.talla}">
+    </div>
+    <div class="campo">
+        <label for="color">Color (opcional)</label>
+        <input id="color" name="color" type="text" th:value="${form.color}">
+    </div>
+    <div class="campo">
+        <label for="precioCompra">Precio de compra en S/ (opcional)</label>
+        <input id="precioCompra" name="precioCompra" type="number" step="0.01" min="0" inputmode="decimal"
+               th:value="${form.precioCompra}">
+    </div>
+    <div class="campo">
+        <label for="precioVenta">Precio de venta en S/ (incluye IGV)</label>
+        <input id="precioVenta" name="precioVenta" type="number" step="0.01" min="0.01" inputmode="decimal"
+               required th:value="${form.precioVenta}">
+    </div>
+    <div class="campo">
+        <label for="stockMinimo">Stock mínimo (opcional)</label>
+        <input id="stockMinimo" name="stockMinimo" type="number" step="1" min="0" th:value="${form.stockMinimo}">
+        <span class="ayuda">Si lo dejas vacío se usa el de la tienda.</span>
+    </div>
+</div>
+</body>
+</html>

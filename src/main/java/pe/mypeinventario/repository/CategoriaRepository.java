@@ -10,4 +10,7 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     List<Categoria> findByCategoriaPadreIsNull();
 
     List<Categoria> findByCategoriaPadreId(Long categoriaPadreId);
+
+    /** @return {@code true} si ya hay una categoría con ese nombre, sin distinguir mayúsculas */
+    boolean existsByNombreIgnoreCase(String nombre);
 }

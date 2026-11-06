@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Mis tiendas')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('tiendas')}"></aside>
+    <main class="contenido">
+        <h1>Mis tiendas</h1>
+        <p class="ayuda">Elige la tienda con la que vas a trabajar.</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(tiendas)}">
+            Aún no tienes tiendas. Crea la primera para empezar a registrar productos.
+        </p>
+        <ul class="tiendas" th:unless="${#lists.isEmpty(tiendas)}">
+            <li class="tienda-etiqueta" th:each="t : ${tiendas}">
+                <h2 th:text="${t.nombre}">Moda Rosa</h2>
+                <p th:if="${t.direccion != null or t.galeria != null}">
+                    <span th:text="${t.direccion}">Jr. Gamarra 450</span>
+                    <span th:if="${t.direccion != null and t.galeria != null}">, </span>
+                    <span th:text="${t.galeria}">Gamarra</span>
+                </p>
+                <form method="post" th:action="@{/tiendas/{id}/elegir(id=${t.id})}">
+                    <button class="btn" type="submit">Trabajar en esta tienda</button>
+                </form>
+            </li>
+        </ul>
+
+        <h2 class="separado">Nueva tienda</h2>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+        <form class="campos" method="post" th:action="@{/tiendas}">
+            <label for="nombre">Nombre de la tienda</label>
+            <input id="nombre" name="nombre" type="text" required th:value="${nombre}">
+            <label for="direccion">Dirección (opcional)</label>
+            <input id="direccion" name="direccion" type="text" th:value="${direccion}">
+            <label for="galeria">Galería o centro comercial (opcional)</label>
+            <input id="galeria" name="galeria" type="text" th:value="${galeria}">
+            <button class="btn btn-claro" type="submit">Crear tienda</button>
+        </form>
+    </main>
+</div>
+</body>
+</html>
