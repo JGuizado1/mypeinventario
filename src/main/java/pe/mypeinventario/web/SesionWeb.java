@@ -43,6 +43,10 @@ public final class SesionWeb {
         return atributo(TIENDA, TiendaResumen.class);
     }
 
+    public TiendaResumen exigirTienda() {
+        return tienda().orElseThrow(() -> new IllegalStateException("No hay una tienda activa"));
+    }
+
     /** Guarda al usuario que ingresó y olvida la tienda de una sesión anterior. */
     public void iniciar(UsuarioSesion usuario) {
         session.setAttribute(USUARIO, usuario);

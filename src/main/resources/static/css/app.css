@@ -22,7 +22,7 @@ body {
 }
 
 h1, h2 { line-height: 1.15; margin: 0 0 .5rem; letter-spacing: -.01em; }
-h1 { font-size: 1.9rem; font-weight: 700; }
+h1 { font-size: 2rem; font-weight: 700; }
 h2 { font-size: 1.25rem; font-weight: 600; }
 a { color: var(--denim); }
 :focus-visible { outline: 3px solid var(--denim); outline-offset: 2px; }
@@ -103,7 +103,7 @@ a { color: var(--denim); }
 .campos { display: grid; gap: .35rem; max-width: 28rem; }
 .campos .btn { margin-top: 1rem; justify-self: start; }
 label { margin-top: .6rem; font-weight: 600; }
-input[type=text], input[type=email], input[type=password], input[type=tel] {
+input[type=text], input[type=email], input[type=password], input[type=tel], input[type=number], select {
     min-height: 2.75rem;
     padding: .5rem .7rem;
     border: 1px solid #8793a1;
@@ -111,7 +111,7 @@ input[type=text], input[type=email], input[type=password], input[type=tel] {
     background: #fff;
     font: inherit;
 }
-input:focus { border-color: var(--denim); }
+input:focus, select:focus { border-color: var(--denim); }
 
 .ayuda { margin: 0 0 .5rem; color: var(--tinta-suave); font-size: .95rem; }
 .aparte { margin: 1.25rem 0 0; font-size: .95rem; }
@@ -202,9 +202,88 @@ body.entrada {
 .libro { max-width: 36rem; margin: 1.5rem 0; }
 .libro div { display: flex; align-items: baseline; gap: .5rem; padding: .7rem 0; border-bottom: 1px solid var(--linea); }
 .libro dt { display: flex; flex: 1; align-items: baseline; }
+.libro dt a { color: var(--tinta); text-decoration: none; }
+.libro dt a:hover { text-decoration: underline; }
 .libro dt::after { content: ""; flex: 1; margin-left: .5rem; border-bottom: 2px dotted var(--linea); }
 .libro dd { margin: 0; font-size: 1.6rem; font-weight: 700; }
 .libro dd.atencion { color: var(--alerta); }
+
+
+/* ---- encabezado de página, migas y mensajes ---- */
+.cabecera-pagina {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.cabecera-pagina h1 { margin-bottom: .25rem; }
+.cabecera-pagina .ayuda { margin: 0; }
+.migas { margin: 0 0 .75rem; color: var(--tinta-suave); font-size: .95rem; }
+.exito {
+    margin: 0 0 1rem;
+    padding: .7rem .9rem;
+    border-left: 4px solid #2e7d5b;
+    background: #e7f4ed;
+    color: #164a33;
+}
+.solo-lector {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ---- botones: la acción principal va en amarillo tiza ---- */
+.btn-principal { border-color: var(--denim-oscuro); background: var(--tiza); color: var(--tinta); }
+.btn-principal:hover { background: #e6b13a; }
+.btn-chico { min-height: 2.25rem; padding: .3rem .8rem; font-size: .95rem; }
+.acciones { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
+
+/* ---- tablas: libro de cuentas ---- */
+.tabla-scroll { overflow-x: auto; margin: 1rem 0 1.5rem; }
+.tabla { width: 100%; border-collapse: collapse; border: 1px solid var(--linea); background: #fff; }
+.tabla th {
+    padding: .6rem .75rem;
+    border-bottom: 2px solid var(--denim);
+    background: #e9edf2;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+.tabla td { padding: .6rem .75rem; border-bottom: 1px solid var(--linea); vertical-align: middle; }
+.tabla tbody tr:hover { background: #f7f9fb; }
+.tabla .num { text-align: right; font-variant-numeric: tabular-nums; }
+.entrada-chica { width: 6.5rem; min-height: 2.25rem; padding: .25rem .5rem; }
+
+/* ---- sellos de estado: llevan texto, no solo color ---- */
+.sello {
+    display: inline-block;
+    padding: .05rem .5rem;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    font-size: .85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.sello.alerta { color: var(--alerta); background: var(--alerta-fondo); }
+.sello.ok { color: #1f6b4a; background: #e7f4ed; }
+.sello.apagado { color: var(--tinta-suave); background: #eef0f3; }
+
+/* ---- formularios en rejilla ---- */
+.grupo { max-width: 46rem; margin: 1.25rem 0; padding: 1rem 1.25rem 1.25rem; border: 1px solid var(--linea); background: #fff; }
+.grupo legend { padding: 0 .4rem; font-weight: 600; }
+.rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .25rem 1rem; }
+.campo { display: flex; flex-direction: column; gap: .3rem; }
+.campo.ancho { grid-column: 1 / -1; }
+.campo .ayuda { margin: 0; font-size: .85rem; }
+.grupo .btn { margin-top: 1rem; }
+.lista-simple { max-width: 36rem; margin: 1rem 0 1.5rem; padding: 0; list-style: none; }
+.lista-simple li { padding: .5rem 0; border-bottom: 1px solid var(--linea); }
+
 
 @media (max-width: 48rem) {
     .marco { grid-template-columns: 1fr; }

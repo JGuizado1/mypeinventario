@@ -16,4 +16,14 @@ import java.util.List;
  */
 public record ProductoResumen(Long id, Long tiendaId, String nombre, String descripcion, String categoria,
                               String marca, boolean activo, List<VarianteResumen> variantes) {
+
+    /** @return unidades disponibles sumando todas las variantes */
+    public int stockTotal() {
+        return variantes.stream().mapToInt(VarianteResumen::stock).sum();
+    }
+
+    /** @return {@code true} si alguna variante alcanzó o bajó de su stock mínimo */
+    public boolean hayStockBajo() {
+        return variantes.stream().anyMatch(VarianteResumen::stockBajo);
+    }
 }

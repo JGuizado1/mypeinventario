@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Productos')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('productos')}"></aside>
+    <main class="contenido">
+        <div class="cabecera-pagina">
+            <div>
+                <h1>Productos</h1>
+                <p class="ayuda" th:if="${todos}">
+                    Se muestran también los inactivos. <a th:href="@{/productos}">Ver solo activos</a>
+                </p>
+                <p class="ayuda" th:unless="${todos}">
+                    Se muestran los productos activos. <a th:href="@{/productos(todos=true)}">Ver también inactivos</a>
+                </p>
+            </div>
+            <a class="btn btn-principal" th:href="@{/productos/nuevo}">Nuevo producto</a>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(productos)}">
+            Esta tienda aún no tiene productos. Registra el primero con «Nuevo producto».
+        </p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(productos)}">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Categoría</th>
+                    <th scope="col">Marca</th>
+                    <th scope="col" class="num">Variantes</th>
+                    <th scope="col" class="num">Stock</th>
+                    <th scope="col">Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${productos}">
+                    <td><a th:href="@{/productos/{id}(id=${p.id})}" th:text="${p.nombre}">Polo básico</a></td>
+                    <td th:text="${p.categoria}">Polos</td>
+                    <td th:text="${p.marca != null} ? ${p.marca} : 'Sin marca'">Gamarra Style</td>
+                    <td class="num" th:text="${#lists.size(p.variantes)}">3</td>
+                    <td class="num" th:text="${p.stockTotal()}">0</td>
+                    <td>
+                        <span class="sello apagado" th:unless="${p.activo}">Inactivo</span>
+                        <span class="sello alerta" th:if="${p.activo and p.hayStockBajo()}">Poco stock</span>
+                        <span class="sello ok" th:if="${p.activo and !p.hayStockBajo()}">En orden</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>

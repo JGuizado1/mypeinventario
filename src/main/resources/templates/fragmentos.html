@@ -15,6 +15,8 @@
     </p>
     <nav aria-label="Principal">
         <a th:href="@{/}" th:classappend="${activo == 'inicio'} ? 'activo'">Inicio</a>
+        <a th:href="@{/productos}" th:classappend="${activo == 'productos'} ? 'activo'">Productos</a>
+        <a th:href="@{/catalogo}" th:classappend="${activo == 'catalogo'} ? 'activo'">Categorías y marcas</a>
         <a th:href="@{/tiendas}" th:classappend="${activo == 'tiendas'} ? 'activo'">Mis tiendas</a>
     </nav>
     <div class="usuario" th:if="${usuario != null}">
