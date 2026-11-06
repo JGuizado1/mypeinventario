@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="cabecera(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' | MypeInventario'">MypeInventario</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<aside class="lateral" th:fragment="menu(activo)">
+    <a class="marca" th:href="@{/}">MypeInventario</a>
+    <p class="tienda-activa" th:if="${tienda != null}">
+        <strong th:text="${tienda.nombre}">Mi tienda</strong>
+        <a th:href="@{/tiendas}">Cambiar de tienda</a>
+    </p>
+    <nav aria-label="Principal">
+        <a th:href="@{/}" th:classappend="${activo == 'inicio'} ? 'activo'">Inicio</a>
+        <a th:href="@{/tiendas}" th:classappend="${activo == 'tiendas'} ? 'activo'">Mis tiendas</a>
+    </nav>
+    <div class="usuario" th:if="${usuario != null}">
+        <span th:text="${usuario.nombre}">Nombre</span>
+        <form method="post" th:action="@{/salir}">
+            <button class="btn-enlace" type="submit">Salir</button>
+        </form>
+    </div>
+</aside>
+</body>
+</html>

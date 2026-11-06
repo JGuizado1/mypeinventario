@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Entrar')}"></head>
+<body class="entrada">
+<main class="etiqueta">
+    <div class="etiqueta__cuerpo">
+        <h1>MypeInventario</h1>
+        <p class="ayuda">Tu stock y tus ventas, al día.</p>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+        <form class="campos" method="post" th:action="@{/login}">
+            <label for="correo">Correo</label>
+            <input id="correo" name="correo" type="email" required autofocus autocomplete="username"
+                   th:value="${correo}">
+            <label for="contrasena">Contraseña</label>
+            <input id="contrasena" name="contrasena" type="password" required autocomplete="current-password">
+            <button class="btn" type="submit">Entrar</button>
+        </form>
+        <p class="aparte">¿Aún no tienes cuenta? <a th:href="@{/registro}">Crear cuenta</a></p>
+    </div>
+</main>
+</body>
+</html>

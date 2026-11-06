@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Inicio')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('inicio')}"></aside>
+    <main class="contenido">
+        <h1 th:text="${resumen.tienda.nombre}">Moda Rosa</h1>
+        <p class="ayuda" th:if="${resumen.tienda.direccion != null or resumen.tienda.galeria != null}">
+            <span th:text="${resumen.tienda.direccion}">Jr. Gamarra 450</span>
+            <span th:if="${resumen.tienda.direccion != null and resumen.tienda.galeria != null}">, </span>
+            <span th:text="${resumen.tienda.galeria}">Gamarra</span>
+        </p>
+
+        <dl class="libro">
+            <div>
+                <dt>Productos activos</dt>
+                <dd th:text="${resumen.productosActivos}">0</dd>
+            </div>
+            <div>
+                <dt>Variantes con poco stock</dt>
+                <dd th:text="${resumen.variantesConStockBajo}"
+                    th:classappend="${resumen.variantesConStockBajo > 0} ? 'atencion'">0</dd>
+            </div>
+            <div>
+                <dt>Alertas por revisar</dt>
+                <dd th:text="${resumen.alertasPendientes}"
+                    th:classappend="${resumen.alertasPendientes > 0} ? 'atencion'">0</dd>
+            </div>
+        </dl>
+
+        <p class="vacio" th:if="${resumen.productosActivos == 0}">
+            Esta tienda aún no tiene productos. Cuando registres el primero, verás aquí su stock.
+        </p>
+        <p class="aviso" th:if="${resumen.alertasPendientes > 0}"
+           th:text="${resumen.alertasPendientes == 1 ? 'Hay 1 producto por reabastecer.' : 'Hay ' + resumen.alertasPendientes + ' productos por reabastecer.'}">
+            Hay productos por reabastecer.
+        </p>
+    </main>
+</div>
+</body>
+</html>

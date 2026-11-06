@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Crear cuenta')}"></head>
+<body class="entrada">
+<main class="etiqueta">
+    <div class="etiqueta__cuerpo">
+        <h1>Crear cuenta</h1>
+        <p class="ayuda">Registra tu negocio y empieza a controlar tu inventario.</p>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+        <form class="campos" method="post" th:action="@{/registro}">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" required autofocus autocomplete="name"
+                   th:value="${nombre}">
+            <label for="correo">Correo</label>
+            <input id="correo" name="correo" type="email" required autocomplete="username" th:value="${correo}">
+            <label for="celular">Celular (opcional)</label>
+            <input id="celular" name="celular" type="tel" inputmode="numeric" pattern="[0-9]{9}"
+                   autocomplete="tel" th:value="${celular}">
+            <p class="ayuda">9 dígitos, sin espacios.</p>
+            <label for="contrasena">Contraseña</label>
+            <input id="contrasena" name="contrasena" type="password" required minlength="8"
+                   autocomplete="new-password">
+            <p class="ayuda">Mínimo 8 caracteres.</p>
+            <button class="btn" type="submit">Crear cuenta</button>
+        </form>
+        <p class="aparte">¿Ya tienes cuenta? <a th:href="@{/login}">Entrar</a></p>
+    </div>
+</main>
+</body>
+</html>

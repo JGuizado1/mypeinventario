@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Error')}"></head>
+<body class="entrada">
+<main class="etiqueta">
+    <div class="etiqueta__cuerpo">
+        <h1 th:text="${titulo ?: 'Algo salió mal'}">Algo salió mal</h1>
+        <p th:text="${mensaje ?: 'Ocurrió un problema. Vuelve al inicio e inténtalo de nuevo.'}">Mensaje</p>
+        <p><a class="btn" th:href="@{/}">Volver al inicio</a></p>
+    </div>
+</main>
+</body>
+</html>
