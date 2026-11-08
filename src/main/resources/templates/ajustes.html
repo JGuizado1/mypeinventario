@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Ajustes de stock')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('ajustes')}"></aside>
+    <main class="contenido contenido-ancho">
+        <h1>Ajustes de stock</h1>
+        <p class="ayuda">Corrige el stock de una variante cuando lo que hay en el estante no coincide con el sistema:
+            mercadería dañada, perdida o un error de conteo. Cada ajuste queda en el historial con su motivo.</p>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(productos)}">
+            Esta tienda aún no tiene productos. <a th:href="@{/productos/nuevo}">Registra un producto</a> primero.
+        </p>
+
+        <form method="get" th:action="@{/ajustes}" th:unless="${#lists.isEmpty(productos)}">
+            <fieldset class="grupo">
+                <legend>1. Elige la variante</legend>
+                <div class="rejilla">
+                    <div class="campo ancho">
+                        <label for="varianteElegir">Variante</label>
+                        <select id="varianteElegir" name="varianteId">
+                            <option value="">Elige una variante</option>
+                            <optgroup th:each="p : ${productos}" th:label="${p.nombre}">
+                                <option th:each="v : ${p.variantes}" th:value="${v.id}"
+                                        th:text="${v.sku + ' · ' + v.descripcion() + ' · stock ' + v.stock}"
+                                        th:selected="${elegida != null and elegida.variante.id == v.id}">POL-M-AZU</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-claro" type="submit">Elegir</button>
+            </fieldset>
+        </form>
+
+        <th:block th:if="${elegida != null}">
+            <form method="post" th:action="@{/ajustes}">
+                <input type="hidden" name="varianteId" th:value="${elegida.variante.id}">
+                <fieldset class="grupo">
+                    <legend>2. Ajusta el stock</legend>
+                    <p class="datos-variante">
+                        <strong th:text="${elegida.producto.nombre}">Polo básico</strong>
+                        <span th:text="${elegida.variante.sku + ' · ' + elegida.variante.descripcion()}">POL-M-AZU · M / Azul</span><br>
+                        Stock actual: <strong th:text="${elegida.variante.stock}">0</strong>
+                        <span class="sello alerta" th:if="${elegida.variante.stockBajo}">Poco stock</span>
+                    </p>
+                    <div class="rejilla">
+                        <div class="campo">
+                            <label for="tipo">¿Qué quieres hacer?</label>
+                            <select id="tipo" name="tipo">
+                                <option value="SUMAR" th:selected="${form.tipo == 'SUMAR'}">Sumar stock (sobran unidades)</option>
+                                <option value="RESTAR" th:selected="${form.tipo == 'RESTAR'}">Restar stock (faltan unidades)</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="cantidad">Cantidad de unidades</label>
+                            <input id="cantidad" name="cantidad" type="number" min="1" step="1" inputmode="numeric"
+                                   required th:value="${form.cantidad}">
+                        </div>
+                        <div class="campo ancho">
+                            <label for="motivo">Motivo</label>
+                            <input id="motivo" name="motivo" type="text" required th:value="${form.motivo}">
+                            <span class="ayuda">Por ejemplo: mercadería dañada, error de conteo, muestra regalada.</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-principal" type="submit">Registrar ajuste</button>
+                </fieldset>
+            </form>
+
+            <h2 class="separado">Historial de la variante</h2>
+            <p class="vacio" th:if="${#lists.isEmpty(historial)}">Esta variante aún no tiene movimientos.</p>
+            <div class="tabla-scroll" th:unless="${#lists.isEmpty(historial)}">
+                <table class="tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Movimiento</th>
+                        <th scope="col" class="num">Unidades</th>
+                        <th scope="col">Motivo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${historial}">
+                        <td th:text="${m.fechaTexto()}">06/11/2026 19:30</td>
+                        <td th:text="${m.tipoTexto()}">Compra</td>
+                        <td class="num" th:text="${m.efectoTexto()}">+10</td>
+                        <td th:text="${m.motivo != null} ? ${m.motivo} : '—'">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+    </main>
+</div>
+</body>
+</html>

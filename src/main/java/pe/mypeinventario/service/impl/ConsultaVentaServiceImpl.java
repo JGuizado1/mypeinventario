@@ -7,9 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pe.mypeinventario.consulta.LineaVentaResumen;
 import pe.mypeinventario.consulta.VentaResumen;
 import pe.mypeinventario.domain.DetalleVenta;
+import pe.mypeinventario.domain.TipoMovimiento;
 import pe.mypeinventario.domain.VarianteSKU;
 import pe.mypeinventario.domain.VentaPunto;
 import pe.mypeinventario.exception.RecursoNoEncontradoException;
+import pe.mypeinventario.repository.MovimientoInventarioRepository;
 import pe.mypeinventario.repository.ProductoItemRepository;
 import pe.mypeinventario.repository.TiendaRepository;
 import pe.mypeinventario.repository.VentaPuntoRepository;
@@ -26,12 +28,15 @@ public class ConsultaVentaServiceImpl implements ConsultaVentaService {
     private final VentaPuntoRepository ventaRepository;
     private final TiendaRepository tiendaRepository;
     private final ProductoItemRepository productoRepository;
+    private final MovimientoInventarioRepository movimientoRepository;
 
     public ConsultaVentaServiceImpl(VentaPuntoRepository ventaRepository, TiendaRepository tiendaRepository,
-                                    ProductoItemRepository productoRepository) {
+                                    ProductoItemRepository productoRepository,
+                                    MovimientoInventarioRepository movimientoRepository) {
         this.ventaRepository = ventaRepository;
         this.tiendaRepository = tiendaRepository;
         this.productoRepository = productoRepository;
+        this.movimientoRepository = movimientoRepository;
     }
 
     @Override
@@ -64,8 +69,10 @@ public class ConsultaVentaServiceImpl implements ConsultaVentaService {
         String producto = productoRepository.findByVarianteId(variante.getId())
                 .map(p -> p.getNombre())
                 .orElse("—");
+        int devueltas = (int) movimientoRepository.sumarCantidadPorDetalleVenta(
+                detalle.getId(), TipoMovimiento.DEVOLUCION_CLIENTE);
         return new LineaVentaResumen(detalle.getId(), variante.getId(), variante.getSku(), producto,
                 variante.getTalla(), variante.getColor(), detalle.getCantidad(), detalle.getPrecioUnitario(),
-                detalle.calcularSubtotal());
+                detalle.calcularSubtotal(), devueltas);
     }
 }

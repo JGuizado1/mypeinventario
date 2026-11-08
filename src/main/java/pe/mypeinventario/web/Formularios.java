@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import pe.mypeinventario.domain.MedioPago;
+import pe.mypeinventario.domain.TipoMovimiento;
 import pe.mypeinventario.exception.OperacionInvalidaException;
 import pe.mypeinventario.service.dto.LineaCompra;
 import pe.mypeinventario.service.dto.LineaVenta;
@@ -23,6 +24,8 @@ final class Formularios {
     static final String CANTIDAD = "cantidad-";
     /** Cada costo de compra llega como un campo llamado «costo-» seguido del id de la variante. */
     static final String COSTO = "costo-";
+    /** Cada conteo de una toma de inventario llega como un campo «conteo-» seguido del id de la variante. */
+    static final String CONTEO = "conteo-";
 
     private Formularios() {
     }
@@ -140,6 +143,49 @@ final class Formularios {
             throw new OperacionInvalidaException("Escribe la cantidad de al menos un producto");
         }
         return cantidades;
+    }
+
+    /** Arma los conteos de una toma con los campos «conteo-ID» que tengan un número escrito. */
+    static Map<Long, Integer> conteos(Map<String, String> parametros) {
+        Map<Long, Integer> conteos = new TreeMap<>();
+        parametros.forEach((nombre, valor) -> {
+            if (!nombre.startsWith(CONTEO) || valor == null || valor.isBlank()) {
+                return;
+            }
+            int contado;
+            try {
+                contado = Integer.parseInt(valor.trim());
+            } catch (NumberFormatException e) {
+                throw new OperacionInvalidaException("El conteo debe ser un número entero");
+            }
+            if (contado < 0) {
+                throw new OperacionInvalidaException("El conteo no puede ser negativo");
+            }
+            conteos.put(id(nombre.substring(CONTEO.length()), "producto"), contado);
+        });
+        if (conteos.isEmpty()) {
+            throw new OperacionInvalidaException("Escribe el conteo de al menos un producto");
+        }
+        return conteos;
+    }
+
+    /** @return {@code AJUSTE_POSITIVO} si se elige sumar y {@code AJUSTE_NEGATIVO} si se elige restar */
+    static TipoMovimiento tipoAjuste(String valor) {
+        if ("SUMAR".equalsIgnoreCase(valor == null ? "" : valor.trim())) {
+            return TipoMovimiento.AJUSTE_POSITIVO;
+        }
+        if ("RESTAR".equalsIgnoreCase(valor == null ? "" : valor.trim())) {
+            return TipoMovimiento.AJUSTE_NEGATIVO;
+        }
+        throw new OperacionInvalidaException("Elige si el ajuste suma o resta stock");
+    }
+
+    /** @return la cantidad escrita; error si falta o no es un entero */
+    static int cantidadObligatoria(String valor) {
+        if (valor == null || valor.isBlank()) {
+            throw new OperacionInvalidaException("Escribe la cantidad");
+        }
+        return entero(valor);
     }
 
     private static int entero(String valor) {

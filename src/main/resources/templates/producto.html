@@ -69,6 +69,7 @@
                               th:action="@{/productos/{pid}/variantes/{vid}/precios(pid=${producto.id},vid=${v.id})}">
                             <button class="btn btn-chico btn-claro" type="submit">Guardar precios</button>
                         </form>
+                        <a class="enlace-chico" th:href="@{/ajustes(varianteId=${v.id})}">Ajustar stock</a>
                     </td>
                 </tr>
                 </tbody>

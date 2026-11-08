@@ -14,12 +14,19 @@ import java.math.BigDecimal;
  * @param cantidad       unidades vendidas
  * @param precioUnitario precio por unidad al momento de la venta
  * @param subtotal       precio por unidad multiplicado por la cantidad
+ * @param devueltas      unidades que el cliente ya devolvió de esta línea
  */
 public record LineaVentaResumen(Long detalleId, Long varianteId, String sku, String producto, String talla,
-                                String color, int cantidad, BigDecimal precioUnitario, BigDecimal subtotal) {
+                                String color, int cantidad, BigDecimal precioUnitario, BigDecimal subtotal,
+                                int devueltas) {
 
     /** @return la variante en una frase corta, por ejemplo «M / Azul» */
     public String variante() {
         return TextoVariante.de(talla, color);
+    }
+
+    /** @return unidades que todavía se pueden devolver */
+    public int porDevolver() {
+        return cantidad - devueltas;
     }
 }

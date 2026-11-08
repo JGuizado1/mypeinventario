@@ -21,6 +21,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/login", "/registro", "/css/**", "/js/**", "/error", "/h2-console/**");
         registry.addInterceptor(new TiendaActivaInterceptor())
                 .addPathPatterns("/productos/**", "/ventas/**", "/compras/**", "/clientes/**",
-                        "/alertas/**", "/reportes/**");
+                        "/alertas/**", "/reportes/**", "/ajustes/**", "/tomas/**");
     }
 }

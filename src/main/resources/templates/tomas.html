@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Toma de inventario')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('tomas')}"></aside>
+    <main class="contenido">
+        <div class="cabecera-pagina">
+            <div>
+                <h1>Toma de inventario</h1>
+                <p class="ayuda">Cuenta lo que hay físicamente en la tienda y compáralo con el sistema.
+                    Al cerrar la toma, cada diferencia se corrige con un ajuste de stock.</p>
+            </div>
+            <a class="btn btn-principal" th:if="${enCurso != null}"
+               th:href="@{/tomas/{id}(id=${enCurso.id})}">Continuar la toma en curso</a>
+            <form method="post" th:action="@{/tomas}" th:if="${enCurso == null}">
+                <button class="btn btn-principal" type="submit">Iniciar una toma</button>
+            </form>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(tomas)}">Esta tienda aún no hizo ninguna toma de inventario.</p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(tomas)}">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">N.°</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col" class="num">Contadas</th>
+                    <th scope="col" class="num">Con diferencia</th>
+                    <th scope="col"><span class="solo-lector">Detalle</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="t : ${tomas}">
+                    <td th:text="${t.id}">1</td>
+                    <td th:text="${t.fechaTexto()}">06/11/2026 19:30</td>
+                    <td>
+                        <span class="sello alerta" th:if="${t.enCurso()}" th:text="${t.estadoTexto()}">En curso</span>
+                        <span class="sello ok" th:unless="${t.enCurso()}" th:text="${t.estadoTexto()}">Cerrada</span>
+                    </td>
+                    <td class="num" th:text="${#lists.size(t.conteos)}">0</td>
+                    <td class="num" th:text="${t.conDiferencia()}">0</td>
+                    <td><a th:href="@{/tomas/{id}(id=${t.id})}">Ver detalle</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>

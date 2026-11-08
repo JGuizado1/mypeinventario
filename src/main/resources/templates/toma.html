@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Toma ' + ${toma.id})}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('tomas')}"></aside>
+    <main class="contenido contenido-ancho">
+        <p class="migas"><a th:href="@{/tomas}">Toma de inventario</a> / Toma <span th:text="${toma.id}">1</span></p>
+
+        <div class="cabecera-pagina">
+            <div>
+                <h1>
+                    Toma <span th:text="${toma.id}">1</span>
+                    <span class="sello alerta" th:if="${toma.enCurso()}" th:text="${toma.estadoTexto()}">En curso</span>
+                    <span class="sello ok" th:unless="${toma.enCurso()}" th:text="${toma.estadoTexto()}">Cerrada</span>
+                </h1>
+                <p class="ayuda">Iniciada el <span th:text="${toma.fechaTexto()}">06/11/2026 19:30</span>.
+                    <span th:text="${#lists.size(toma.conteos)}">0</span> variante(s) contada(s),
+                    <span th:text="${toma.conDiferencia()}">0</span> con diferencia.</p>
+            </div>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <!-- Toma en curso: se anotan los conteos y se puede cerrar. -->
+        <th:block th:if="${toma.enCurso()}">
+            <p class="nota">Escribe cuántas unidades cuentas de cada variante. Puedes anotar por partes: lo que ya
+                contaste queda guardado y no se puede cambiar. El sistema guarda cuánto stock tenía al
+                momento de anotar.</p>
+
+            <form method="post" th:action="@{/tomas/{id}/conteos(id=${toma.id})}">
+                <div class="campo filtro">
+                    <label for="filtro">Buscar por producto, talla, color o SKU</label>
+                    <input id="filtro" type="search" data-filtro="lineas" autocomplete="off">
+                </div>
+                <div class="tabla-scroll">
+                    <table class="tabla" id="lineas">
+                        <thead>
+                        <tr>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Variante</th>
+                            <th scope="col">SKU</th>
+                            <th scope="col" class="num">Stock en el sistema</th>
+                            <th scope="col">Contado</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="p : ${productos}">
+                            <tr th:each="v : ${p.variantes}">
+                                <td>
+                                    <span th:text="${p.nombre}">Polo básico</span>
+                                    <span class="sello apagado" th:unless="${p.activo}">Inactivo</span>
+                                </td>
+                                <td th:text="${v.descripcion()}">M / Azul</td>
+                                <td th:text="${v.sku}">POL-M-AZU</td>
+                                <td class="num" th:text="${contados[v.id] != null} ? ${contados[v.id].stockSistema} : ${v.stock}">0</td>
+                                <td th:if="${contados[v.id] == null}">
+                                    <input class="entrada-chica" type="number" min="0" step="1" inputmode="numeric"
+                                           th:name="${'conteo-' + v.id}"
+                                           th:value="${conteos['conteo-' + v.id]}"
+                                           th:attr="aria-label=${'Unidades contadas de ' + p.nombre + ' ' + v.sku}">
+                                </td>
+                                <td th:if="${contados[v.id] != null}">
+                                    <strong th:text="${contados[v.id].stockContado}">0</strong>
+                                    <span class="sello ok" th:if="${contados[v.id].diferencia() == 0}">Coincide</span>
+                                    <span class="sello alerta" th:if="${contados[v.id].diferencia() != 0}"
+                                          th:text="${'Diferencia ' + contados[v.id].diferenciaTexto()}">Diferencia -2</span>
+                                </td>
+                            </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-principal" type="submit">Guardar conteos</button>
+            </form>
+
+            <h2 class="separado">Cerrar la toma</h2>
+            <p class="nota" th:if="${#lists.isEmpty(toma.conteos)}">Anota al menos un conteo para poder cerrar la toma.</p>
+            <th:block th:unless="${#lists.isEmpty(toma.conteos)}">
+                <p class="nota">Al cerrar, cada diferencia se aplica como un ajuste de stock con el motivo
+                    «Toma de inventario». Las variantes que no contaste no se tocan. No se puede deshacer.</p>
+                <form method="post" th:action="@{/tomas/{id}/cerrar(id=${toma.id})}">
+                    <button class="btn btn-principal" type="submit">Cerrar la toma y ajustar el stock</button>
+                </form>
+            </th:block>
+        </th:block>
+
+        <!-- Toma cerrada: solo resultados. -->
+        <th:block th:unless="${toma.enCurso()}">
+            <div class="tabla-scroll">
+                <table class="tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Variante</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col" class="num">Sistema</th>
+                        <th scope="col" class="num">Contado</th>
+                        <th scope="col">Resultado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${toma.conteos}">
+                        <td th:text="${c.producto}">Polo básico</td>
+                        <td th:text="${c.variante()}">M / Azul</td>
+                        <td th:text="${c.sku}">POL-M-AZU</td>
+                        <td class="num" th:text="${c.stockSistema}">10</td>
+                        <td class="num" th:text="${c.stockContado}">8</td>
+                        <td>
+                            <span class="sello ok" th:if="${c.diferencia() == 0}">Coincide</span>
+                            <span class="sello alerta" th:if="${c.diferencia() != 0}"
+                                  th:text="${'Ajustado ' + c.diferenciaTexto()}">Ajustado -2</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+    </main>
+</div>
+<script th:src="@{/js/lineas.js}" defer></script>
+</body>
+</html>

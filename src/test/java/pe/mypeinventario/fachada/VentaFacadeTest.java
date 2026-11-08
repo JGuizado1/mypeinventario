@@ -48,7 +48,7 @@ class VentaFacadeTest {
 
     private static VentaResumen venta(Long id, Long tiendaId, Long varianteId) {
         LineaVentaResumen linea = new LineaVentaResumen(1L, varianteId, "POL-M-NEG", "Polo básico", "M", "Negro",
-                8, new BigDecimal("29.90"), new BigDecimal("239.20"));
+                8, new BigDecimal("29.90"), new BigDecimal("239.20"), 0);
         return new VentaResumen(id, tiendaId, LocalDateTime.of(2026, 11, 6, 19, 30), null, MedioPago.YAPE,
                 new BigDecimal("239.20"), BigDecimal.ZERO, new BigDecimal("239.20"), new BigDecimal("36.49"),
                 List.of(linea));
