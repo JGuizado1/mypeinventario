@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Nueva compra')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('compras')}"></aside>
+    <main class="contenido contenido-ancho">
+        <p class="migas"><a th:href="@{/compras}">Compras</a> / Nueva compra</p>
+        <h1>Nueva compra</h1>
+        <p class="ayuda">Escribe cuántas unidades compraste de cada producto y a qué costo. Al registrarla,
+            el stock sube y las alertas de reabastecimiento que ya no apliquen se cierran.</p>
+
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(proveedores)}">
+            Primero registra un proveedor en <a th:href="@{/proveedores}">Proveedores</a>.
+        </p>
+        <p class="vacio" th:if="${#lists.isEmpty(productos)}">
+            Esta tienda aún no tiene productos. <a th:href="@{/productos/nuevo}">Registra un producto</a> primero.
+        </p>
+
+        <form id="form-compra" method="post" th:action="@{/compras}"
+              th:unless="${#lists.isEmpty(proveedores) or #lists.isEmpty(productos)}">
+            <fieldset class="grupo grupo-ancho">
+                <legend>Proveedor</legend>
+                <div class="rejilla">
+                    <div class="campo">
+                        <label for="proveedorId">Proveedor</label>
+                        <select id="proveedorId" name="proveedorId" required>
+                            <option value="">Elige un proveedor</option>
+                            <option th:each="p : ${proveedores}" th:value="${p.id}"
+                                    th:text="${p.razonSocial + ' (RUC ' + p.ruc + ')'}"
+                                    th:selected="${form.proveedorId == '' + p.id}">Textiles Gamarra SAC</option>
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+
+            <h2>Productos</h2>
+            <div class="campo filtro">
+                <label for="filtro">Buscar por producto, talla, color o SKU</label>
+                <input id="filtro" type="search" data-filtro="lineas" autocomplete="off">
+            </div>
+            <div class="tabla-scroll">
+                <table class="tabla" id="lineas">
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Variante</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col" class="num">Stock actual</th>
+                        <th scope="col">Costo S/</th>
+                        <th scope="col">Cantidad</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="p : ${productos}">
+                        <tr th:each="v : ${p.variantes}">
+                            <td>
+                                <span th:text="${p.nombre}">Polo básico</span>
+                                <span class="sello apagado" th:unless="${p.activo}">Inactivo</span>
+                            </td>
+                            <td th:text="${v.descripcion()}">M / Azul</td>
+                            <td th:text="${v.sku}">POL-M-AZU</td>
+                            <td class="num">
+                                <span th:text="${v.stock}">0</span>
+                                <span class="sello alerta" th:if="${v.stockBajo}">Poco stock</span>
+                            </td>
+                            <td>
+                                <input class="entrada-chica costo-linea" type="number" min="0" step="0.01"
+                                       inputmode="decimal" th:name="${'costo-' + v.id}"
+                                       th:value="${campos['costo-' + v.id] ?: v.precioCompra}"
+                                       th:attr="aria-label=${'Costo de ' + p.nombre + ' ' + v.sku}">
+                            </td>
+                            <td>
+                                <input class="entrada-chica cantidad-linea" type="number" min="0" step="1"
+                                       inputmode="numeric" th:name="${'cantidad-' + v.id}"
+                                       th:value="${campos['cantidad-' + v.id]}"
+                                       th:attr="aria-label=${'Cantidad de ' + p.nombre + ' ' + v.sku}">
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="barra-total" aria-live="polite">
+                <span>Unidades: <strong id="resumen-unidades">0</strong></span>
+                <span>Total estimado: S/ <strong id="resumen-total">0.00</strong></span>
+                <button class="btn btn-principal" type="submit">Registrar compra</button>
+            </div>
+        </form>
+    </main>
+</div>
+<script th:src="@{/js/lineas.js}" defer></script>
+</body>
+</html>

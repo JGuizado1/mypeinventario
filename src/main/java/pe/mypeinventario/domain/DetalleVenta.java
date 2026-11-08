@@ -26,9 +26,12 @@ public class DetalleVenta {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal precioUnitario;
 
+    @Column(precision = 12, scale = 2)
+    private BigDecimal costoUnitario;
+
     /**
      * @param id             identificador (puede ser {@code null} hasta que se persista)
-     * @param variante       variante vendida
+     * @param variante       variante vendida; de ella se toma  el costo del momento
      * @param cantidad       unidades, mayor que cero
      * @param precioUnitario precio por unidad, no negativo
      * @throws IllegalArgumentException si algún dato es inválido
@@ -47,10 +50,16 @@ public class DetalleVenta {
         this.variante = variante;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
+        this.costoUnitario = variante.getPrecioCompra();
     }
 
     /** @return precio unitario multiplicado por la cantidad */
     public BigDecimal calcularSubtotal() {
         return precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+    }
+
+    /** @return costo unitario multiplicado por la cantidad, o {@code null} si el costo se desconocía */
+    public BigDecimal calcularCosto() {
+        return costoUnitario == null ? null : costoUnitario.multiply(BigDecimal.valueOf(cantidad));
     }
 }

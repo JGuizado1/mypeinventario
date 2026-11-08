@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Proveedores')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('proveedores')}"></aside>
+    <main class="contenido">
+        <h1>Proveedores</h1>
+        <p class="ayuda">Los mayoristas a los que compras. Son compartidos por todas tus tiendas.</p>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(proveedores)}">Aún no hay proveedores. Registra el primero abajo.</p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(proveedores)}">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">Razón social</th>
+                    <th scope="col">RUC</th>
+                    <th scope="col">Contacto</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Celular</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${proveedores}">
+                    <td th:text="${p.razonSocial}">Textiles Gamarra SAC</td>
+                    <td th:text="${p.ruc}">20123456789</td>
+                    <td th:text="${p.contacto}">Luis Paredes</td>
+                    <td th:text="${p.correo}">ventas@textiles.pe</td>
+                    <td th:text="${p.celular != null} ? ${p.celular} : '—'">987654321</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form method="post" th:action="@{/proveedores}">
+            <fieldset class="grupo">
+                <legend>Nuevo proveedor</legend>
+                <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+                <div class="rejilla">
+                    <div class="campo">
+                        <label for="razonSocial">Razón social</label>
+                        <input id="razonSocial" name="razonSocial" type="text" required th:value="${razonSocial}">
+                    </div>
+                    <div class="campo">
+                        <label for="ruc">RUC</label>
+                        <input id="ruc" name="ruc" type="text" inputmode="numeric" required th:value="${ruc}">
+                        <span class="ayuda">11 dígitos.</span>
+                    </div>
+                    <div class="campo">
+                        <label for="contacto">Persona de contacto</label>
+                        <input id="contacto" name="contacto" type="text" required th:value="${contacto}">
+                    </div>
+                    <div class="campo">
+                        <label for="correo">Correo</label>
+                        <input id="correo" name="correo" type="email" required th:value="${correo}">
+                    </div>
+                    <div class="campo">
+                        <label for="celular">Celular (opcional)</label>
+                        <input id="celular" name="celular" type="tel" inputmode="numeric" th:value="${celular}">
+                        <span class="ayuda">9 dígitos.</span>
+                    </div>
+                </div>
+                <button class="btn btn-principal" type="submit">Registrar proveedor</button>
+            </fieldset>
+        </form>
+    </main>
+</div>
+</body>
+</html>

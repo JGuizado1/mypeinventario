@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Ventas')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('ventas')}"></aside>
+    <main class="contenido">
+        <div class="cabecera-pagina">
+            <div>
+                <h1>Ventas</h1>
+                <p class="ayuda">Lo vendido en esta tienda, de lo más reciente a lo más antiguo.</p>
+            </div>
+            <a class="btn btn-principal" th:href="@{/ventas/nueva}">Nueva venta</a>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(ventas)}">
+            Esta tienda aún no registra ventas. Empieza con «Nueva venta».
+        </p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(ventas)}">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">N.°</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Pago</th>
+                    <th scope="col" class="num">Unidades</th>
+                    <th scope="col" class="num">Total</th>
+                    <th scope="col"><span class="solo-lector">Detalle</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="v : ${ventas}">
+                    <td th:text="${v.id}">1</td>
+                    <td th:text="${v.fechaTexto()}">06/11/2026 19:30</td>
+                    <td th:text="${v.cliente != null} ? ${v.cliente} : 'Cliente de mostrador'">Rosa</td>
+                    <td th:text="${v.medioPagoTexto()}">Efectivo</td>
+                    <td class="num" th:text="${v.unidades()}">2</td>
+                    <td class="num"><span th:replace="~{fragmentos :: soles(${v.total})}">S/ 0.00</span></td>
+                    <td><a th:href="@{/ventas/{id}(id=${v.id})}">Ver detalle</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>

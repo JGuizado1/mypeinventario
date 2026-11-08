@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Clientes')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('clientes')}"></aside>
+    <main class="contenido">
+        <h1>Clientes</h1>
+        <p class="ayuda">Los clientes de esta tienda. Registrarlos es opcional: también puedes vender a un cliente de mostrador.</p>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(clientes)}">Esta tienda aún no tiene clientes registrados.</p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(clientes)}">
+            <table class="tabla">
+                <thead>
+                <tr><th scope="col">Nombre</th><th scope="col">DNI o RUC</th><th scope="col">Celular</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${clientes}">
+                    <td th:text="${c.nombre}">Rosa Quispe</td>
+                    <td th:text="${c.documento != null} ? ${c.documento} : '—'">12345678</td>
+                    <td th:text="${c.celular != null} ? ${c.celular} : '—'">987654321</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form method="post" th:action="@{/clientes}">
+            <fieldset class="grupo">
+                <legend>Nuevo cliente</legend>
+                <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+                <div class="rejilla">
+                    <div class="campo">
+                        <label for="nombre">Nombre</label>
+                        <input id="nombre" name="nombre" type="text" required th:value="${nombre}">
+                    </div>
+                    <div class="campo">
+                        <label for="documento">DNI o RUC (opcional)</label>
+                        <input id="documento" name="documento" type="text" inputmode="numeric" th:value="${documento}">
+                        <span class="ayuda">8 dígitos para DNI, 11 para RUC.</span>
+                    </div>
+                    <div class="campo">
+                        <label for="celular">Celular (opcional)</label>
+                        <input id="celular" name="celular" type="tel" inputmode="numeric" th:value="${celular}">
+                        <span class="ayuda">9 dígitos.</span>
+                    </div>
+                </div>
+                <button class="btn btn-principal" type="submit">Registrar cliente</button>
+            </fieldset>
+        </form>
+    </main>
+</div>
+</body>
+</html>

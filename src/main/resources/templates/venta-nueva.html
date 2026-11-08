@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Nueva venta')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('ventas')}"></aside>
+    <main class="contenido contenido-ancho">
+        <p class="migas"><a th:href="@{/ventas}">Ventas</a> / Nueva venta</p>
+        <h1>Nueva venta</h1>
+        <p class="ayuda">Escribe cuántas unidades de cada producto lleva el cliente. Los precios ya incluyen IGV;
+            el desglose aparece al registrar la venta.</p>
+
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(productos)}">
+            No hay productos activos para vender. <a th:href="@{/productos/nuevo}">Registra un producto</a> primero.
+        </p>
+
+        <form id="form-venta" method="post" th:action="@{/ventas}" th:unless="${#lists.isEmpty(productos)}">
+            <fieldset class="grupo grupo-ancho">
+                <legend>Cliente, pago y descuento</legend>
+                <div class="rejilla">
+                    <div class="campo">
+                        <label for="clienteId">Cliente</label>
+                        <select id="clienteId" name="clienteId">
+                            <option value="">Cliente de mostrador (sin registrar)</option>
+                            <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombre}"
+                                    th:selected="${form.clienteId == '' + c.id}">Rosa Quispe</option>
+                        </select>
+                        <span class="ayuda">¿Cliente nuevo? <a th:href="@{/clientes}">Regístralo aquí</a>.</span>
+                    </div>
+                    <div class="campo">
+                        <label for="medioPago">Medio de pago</label>
+                        <select id="medioPago" name="medioPago">
+                            <option th:each="m : ${medios}" th:value="${m.name()}"
+                                    th:text="${#strings.capitalize(#strings.toLowerCase(m.name()))}"
+                                    th:selected="${m.name() == form.medioPago}">Efectivo</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="descuentoPorcentaje">Descuento en % (opcional)</label>
+                        <input id="descuentoPorcentaje" name="descuentoPorcentaje" type="number" step="0.01"
+                               min="0" max="100" inputmode="decimal" th:value="${form.descuentoPorcentaje}">
+                    </div>
+                    <div class="campo">
+                        <label for="descuentoMonto">Descuento en S/ (opcional)</label>
+                        <input id="descuentoMonto" name="descuentoMonto" type="number" step="0.01" min="0"
+                               inputmode="decimal" th:value="${form.descuentoMonto}">
+                        <span class="ayuda">Si pones los dos, primero se resta el porcentaje.</span>
+                    </div>
+                </div>
+            </fieldset>
+
+            <h2>Productos</h2>
+            <div class="campo filtro">
+                <label for="filtro">Buscar por producto, talla, color o SKU</label>
+                <input id="filtro" type="search" data-filtro="lineas" autocomplete="off">
+            </div>
+            <div class="tabla-scroll">
+                <table class="tabla" id="lineas">
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Variante</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col" class="num">Stock</th>
+                        <th scope="col" class="num">Precio</th>
+                        <th scope="col">Cantidad</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="p : ${productos}">
+                        <tr th:each="v : ${p.variantes}">
+                            <td th:text="${p.nombre}">Polo básico</td>
+                            <td th:text="${v.descripcion()}">M / Azul</td>
+                            <td th:text="${v.sku}">POL-M-AZU</td>
+                            <td class="num">
+                                <span th:text="${v.stock}">0</span>
+                                <span class="sello alerta" th:if="${v.stockBajo and v.stock > 0}">Poco stock</span>
+                            </td>
+                            <td class="num"><span th:replace="~{fragmentos :: soles(${v.precioVenta})}">S/ 0.00</span></td>
+                            <td th:if="${v.stock > 0}">
+                                <input class="entrada-chica cantidad-linea" type="number" min="0" step="1"
+                                       inputmode="numeric" th:max="${v.stock}"
+                                       th:name="${'cantidad-' + v.id}"
+                                       th:value="${cantidades['cantidad-' + v.id]}"
+                                       th:attr="data-precio=${v.precioVenta},aria-label=${'Cantidad de ' + p.nombre + ' ' + v.sku}">
+                            </td>
+                            <td th:unless="${v.stock > 0}"><span class="sello apagado">Agotado</span></td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="barra-total" aria-live="polite">
+                <span>Unidades: <strong id="resumen-unidades">0</strong></span>
+                <span>Total estimado: S/ <strong id="resumen-total">0.00</strong></span>
+                <button class="btn btn-principal" type="submit">Registrar venta</button>
+            </div>
+        </form>
+    </main>
+</div>
+<script th:src="@{/js/lineas.js}" defer></script>
+</body>
+</html>

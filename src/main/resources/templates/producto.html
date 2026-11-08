@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera(${producto.nombre})}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('productos')}"></aside>
+    <main class="contenido">
+        <p class="migas"><a th:href="@{/productos}">Productos</a> / <span th:text="${producto.nombre}">Polo básico</span></p>
+
+        <div class="cabecera-pagina">
+            <div>
+                <h1>
+                    <span th:text="${producto.nombre}">Polo básico</span>
+                    <span class="sello apagado" th:unless="${producto.activo}">Inactivo</span>
+                </h1>
+                <p class="ayuda">
+                    <span>Categoría: <strong th:text="${producto.categoria}">Polos</strong>.</span>
+                    <span th:if="${producto.marca != null}">Marca: <strong th:text="${producto.marca}">Gamarra Style</strong>.</span>
+                    <span th:if="${producto.descripcion != null}" th:text="${producto.descripcion}">Descripción</span>
+                </p>
+            </div>
+            <form method="post" th:action="@{/productos/{id}/estado(id=${producto.id})}">
+                <input type="hidden" name="activo" th:value="${!producto.activo}">
+                <button class="btn btn-claro" type="submit"
+                        th:text="${producto.activo} ? 'Desactivar producto' : 'Activar producto'">Desactivar producto</button>
+            </form>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <h2>Variantes</h2>
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">SKU</th>
+                    <th scope="col">Talla</th>
+                    <th scope="col">Color</th>
+                    <th scope="col" class="num">Stock</th>
+                    <th scope="col" class="num">Mínimo</th>
+                    <th scope="col">Compra S/</th>
+                    <th scope="col">Venta S/</th>
+                    <th scope="col"><span class="solo-lector">Acción</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="v : ${producto.variantes}">
+                    <td th:text="${v.sku}">POL-M-AZU</td>
+                    <td th:text="${v.talla != null} ? ${v.talla} : '—'">M</td>
+                    <td th:text="${v.color != null} ? ${v.color} : '—'">Azul</td>
+                    <td class="num">
+                        <span th:text="${v.stock}">0</span>
+                        <span class="sello alerta" th:if="${v.stockBajo}">Poco stock</span>
+                    </td>
+                    <td class="num" th:text="${v.stockMinimo}">5</td>
+                    <td>
+                        <input class="entrada-chica" type="number" step="0.01" min="0" name="precioCompra"
+                               th:value="${v.precioCompra}"
+                               th:attr="form=${'precios-' + v.id},aria-label=${'Precio de compra de ' + v.sku}">
+                    </td>
+                    <td>
+                        <input class="entrada-chica" type="number" step="0.01" min="0.01" name="precioVenta" required
+                               th:value="${v.precioVenta}"
+                               th:attr="form=${'precios-' + v.id},aria-label=${'Precio de venta de ' + v.sku}">
+                    </td>
+                    <td>
+                        <form th:id="${'precios-' + v.id}" method="post"
+                              th:action="@{/productos/{pid}/variantes/{vid}/precios(pid=${producto.id},vid=${v.id})}">
+                            <button class="btn btn-chico btn-claro" type="submit">Guardar precios</button>
+                        </form>
+                        <a class="enlace-chico" th:href="@{/ajustes(varianteId=${v.id})}">Ajustar stock</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form method="post" th:action="@{/productos/{id}/variantes(id=${producto.id})}">
+            <fieldset class="grupo">
+                <legend>Agregar otra variante</legend>
+                <div th:replace="~{fragmentos-variante :: campos}"></div>
+                <button class="btn btn-principal" type="submit">Agregar variante</button>
+            </fieldset>
+        </form>
+    </main>
+</div>
+</body>
+</html>

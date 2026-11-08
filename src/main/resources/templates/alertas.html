@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Alertas')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('alertas')}"></aside>
+    <main class="contenido contenido-ancho">
+        <div class="cabecera-pagina">
+            <div>
+                <h1>Alertas</h1>
+                <p class="ayuda">Se crea una alerta cuando una variante llega a su stock mínimo o baja de él.
+                    Se cierra sola cuando el stock se recupera con una compra.</p>
+            </div>
+            <a class="btn btn-principal" th:href="@{/compras/nueva}">Nueva compra</a>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <nav class="pestanas" aria-label="Estado de las alertas">
+            <a th:href="@{/alertas}" th:classappend="${!atendidas} ? 'activa'"
+               th:attr="aria-current=${!atendidas} ? 'page' : null">Por atender</a>
+            <a th:href="@{/alertas(atendidas=true)}" th:classappend="${atendidas} ? 'activa'"
+               th:attr="aria-current=${atendidas} ? 'page' : null">Atendidas</a>
+        </nav>
+
+        <p class="vacio" th:if="${#lists.isEmpty(alertas) and !atendidas}">
+            No hay alertas por atender. Todo tu stock está sobre el mínimo.
+        </p>
+        <p class="vacio" th:if="${#lists.isEmpty(alertas) and atendidas}">Aún no atendiste ninguna alerta.</p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(alertas)}">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Variante</th>
+                    <th scope="col">SKU</th>
+                    <th scope="col" class="num">Stock</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col"><span class="solo-lector">Acciones</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${alertas}">
+                    <td th:text="${a.fechaTexto()}">06/11/2026 19:30</td>
+                    <td th:text="${a.producto}">Polo básico</td>
+                    <td th:text="${a.variante()}">M / Negro</td>
+                    <td th:text="${a.sku}">POL-M-NEG</td>
+                    <td class="num"><span th:text="${a.stockActual}">2</span>
+                        <span class="ayuda">(mínimo <span th:text="${a.stockMinimo}">5</span>)</span></td>
+                    <td>
+                        <span class="sello alerta" th:if="${a.pendiente()}" th:text="${a.estadoTexto()}">Pendiente</span>
+                        <span class="sello apagado" th:if="${a.abierta() and !a.pendiente()}" th:text="${a.estadoTexto()}">Vista</span>
+                        <span class="sello ok" th:unless="${a.abierta()}" th:text="${a.estadoTexto()}">Atendida</span>
+                    </td>
+                    <td>
+                        <div class="acciones-fila" th:if="${a.abierta()}">
+                            <form method="post" th:if="${a.pendiente()}"
+                                  th:action="@{/alertas/{id}/vista(id=${a.id})}">
+                                <button class="btn btn-chico btn-claro" type="submit">Marcar vista</button>
+                            </form>
+                            <form method="post" th:action="@{/alertas/{id}/atendida(id=${a.id})}">
+                                <button class="btn btn-chico btn-claro" type="submit">Marcar atendida</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="separado">Avisos recientes</h2>
+        <p class="ayuda">Los últimos avisos de stock bajo que generó el sistema para esta tienda, del más nuevo al más antiguo.</p>
+        <p class="vacio" th:if="${#lists.isEmpty(avisos)}">Todavía no hay avisos recientes.</p>
+        <ul class="lista-simple lista-ancha" th:unless="${#lists.isEmpty(avisos)}">
+            <li th:each="aviso : ${avisos}" th:text="${aviso}">Stock bajo: POL-M-NEG (Polo básico M/Negro): quedan 2 unidades; el mínimo es 5.</li>
+        </ul>
+    </main>
+</div>
+</body>
+</html>

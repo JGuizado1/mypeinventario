@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Nuevo producto')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('productos')}"></aside>
+    <main class="contenido">
+        <p class="migas"><a th:href="@{/productos}">Productos</a> / Nuevo producto</p>
+        <h1>Nuevo producto</h1>
+        <p class="ayuda">Un producto se vende en variantes (talla y color). Aquí registras el producto y su primera variante; las demás las agregas después.</p>
+
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <form method="post" th:action="@{/productos}">
+            <fieldset class="grupo">
+                <legend>Producto</legend>
+                <div class="rejilla">
+                    <div class="campo ancho">
+                        <label for="nombre">Nombre</label>
+                        <input id="nombre" name="nombre" type="text" required autofocus th:value="${form.nombre}">
+                    </div>
+                    <div class="campo ancho">
+                        <label for="descripcion">Descripción (opcional)</label>
+                        <input id="descripcion" name="descripcion" type="text" th:value="${form.descripcion}">
+                    </div>
+                    <div class="campo">
+                        <label for="categoriaId">Categoría</label>
+                        <select id="categoriaId" name="categoriaId" required>
+                            <option value="">Elige una categoría</option>
+                            <option th:each="c : ${categorias}" th:value="${c.id}"
+                                    th:selected="${form.categoriaId != null and form.categoriaId == c.id}"
+                                    th:text="${c.padre != null} ? ${c.padre} + ' › ' + ${c.nombre} : ${c.nombre}">Polos</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="marcaId">Marca (opcional)</label>
+                        <select id="marcaId" name="marcaId">
+                            <option value="">Sin marca</option>
+                            <option th:each="m : ${marcas}" th:value="${m.id}"
+                                    th:selected="${form.marcaId != null and form.marcaId == m.id}"
+                                    th:text="${m.nombre}">Gamarra Style</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="ayuda" th:if="${#lists.isEmpty(categorias)}">
+                    Aún no hay categorías. <a th:href="@{/catalogo}">Crea la primera</a> antes de registrar el producto.
+                </p>
+                <p class="ayuda" th:unless="${#lists.isEmpty(categorias)}">
+                    ¿No está la categoría o la marca? <a th:href="@{/catalogo}">Créala en Categorías y marcas</a>.
+                </p>
+            </fieldset>
+
+            <fieldset class="grupo">
+                <legend>Primera variante</legend>
+                <div th:replace="~{fragmentos-variante :: campos}"></div>
+            </fieldset>
+
+            <div class="acciones">
+                <button class="btn btn-principal" type="submit">Guardar producto</button>
+                <a class="btn btn-claro" th:href="@{/productos}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

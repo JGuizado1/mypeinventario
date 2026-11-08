@@ -1,8 +1,10 @@
 package pe.mypeinventario.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pe.mypeinventario.consulta.AlertaResumen;
 import pe.mypeinventario.domain.AlertaReabastecimiento;
 import pe.mypeinventario.domain.EstadoAlerta;
 import pe.mypeinventario.domain.MovimientoInventario;
@@ -51,6 +53,20 @@ public class ConsultaInventarioServiceImpl implements ConsultaInventarioService 
             throw new RecursoNoEncontradoException("Tienda", tiendaId);
         }
         return alertaRepository.listarPorTiendaYEstado(tiendaId, estado);
+    }
+
+    @Override
+    public List<AlertaResumen> listarResumenAlertas(Long tiendaId, Collection<EstadoAlerta> estados) {
+        if (!tiendaRepository.existsById(tiendaId)) {
+            throw new RecursoNoEncontradoException("Tienda", tiendaId);
+        }
+        return alertaRepository.resumenesPorTiendaYEstados(tiendaId, estados);
+    }
+
+    @Override
+    public AlertaResumen obtenerResumenAlerta(Long alertaId) {
+        return alertaRepository.resumenPorId(alertaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alerta", alertaId));
     }
 
     private void exigirVariante(Long varianteId) {
