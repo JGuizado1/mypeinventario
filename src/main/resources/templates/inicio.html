@@ -14,7 +14,11 @@
                     <span th:text="${resumen.tienda.galeria}">Gamarra</span>
                 </p>
             </div>
-            <a class="btn btn-principal" th:href="@{/productos/nuevo}">Nuevo producto</a>
+            <div class="acciones-cabecera">
+                <a class="btn btn-principal" th:href="@{/ventas/nueva}">Nueva venta</a>
+                <a class="btn btn-claro" th:href="@{/compras/nueva}">Nueva compra</a>
+                <a class="btn btn-claro" th:href="@{/productos/nuevo}">Nuevo producto</a>
+            </div>
         </div>
 
         <dl class="libro">

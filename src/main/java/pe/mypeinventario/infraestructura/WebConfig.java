@@ -8,7 +8,8 @@ import pe.mypeinventario.web.TiendaActivaInterceptor;
 
 /**
  * Reglas de acceso de la web, en este orden: primero haber ingresado y, para las pantallas
- * de una tienda, haber elegido una.
+ * de una tienda, haber elegido una. Los proveedores y el catálogo son compartidos y no
+ * necesitan una tienda elegida.
  */
 @Configuration(proxyBeanMethods = false)
 public class WebConfig implements WebMvcConfigurer {
@@ -17,8 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AccesoInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login", "/registro", "/css/**", "/error", "/h2-console/**");
+                .excludePathPatterns("/login", "/registro", "/css/**", "/js/**", "/error", "/h2-console/**");
         registry.addInterceptor(new TiendaActivaInterceptor())
-                .addPathPatterns("/productos/**");
+                .addPathPatterns("/productos/**", "/ventas/**", "/compras/**", "/clientes/**");
     }
 }

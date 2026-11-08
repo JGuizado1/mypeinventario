@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Compra ' + ${compra.id})}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('compras')}"></aside>
+    <main class="contenido">
+        <p class="migas"><a th:href="@{/compras}">Compras</a> / Compra <span th:text="${compra.id}">1</span></p>
+
+        <div class="cabecera-pagina">
+            <h1>Compra <span th:text="${compra.id}">1</span></h1>
+            <a class="btn btn-principal" th:href="@{/compras/nueva}">Nueva compra</a>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+
+        <dl class="datos">
+            <div><dt>Fecha</dt><dd th:text="${compra.fechaTexto()}">06/11/2026 19:30</dd></div>
+            <div><dt>Proveedor</dt><dd th:text="${compra.proveedor}">Textiles Gamarra SAC</dd></div>
+            <div><dt>Unidades</dt><dd th:text="${compra.unidades()}">20</dd></div>
+        </dl>
+
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Variante</th>
+                    <th scope="col">SKU</th>
+                    <th scope="col" class="num">Cantidad</th>
+                    <th scope="col" class="num">Costo</th>
+                    <th scope="col" class="num">Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="l : ${compra.lineas}">
+                    <td th:text="${l.producto}">Polo básico</td>
+                    <td th:text="${l.variante()}">M / Azul</td>
+                    <td th:text="${l.sku}">POL-M-AZU</td>
+                    <td class="num" th:text="${l.cantidad}">10</td>
+                    <td class="num"><span th:replace="~{fragmentos :: soles(${l.costoUnitario})}">S/ 0.00</span></td>
+                    <td class="num"><span th:replace="~{fragmentos :: soles(${l.subtotal})}">S/ 0.00</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <dl class="totales">
+            <div class="total-final"><dt>Total de la compra</dt>
+                <dd><span th:replace="~{fragmentos :: soles(${compra.total})}">S/ 0.00</span></dd></div>
+        </dl>
+    </main>
+</div>
+</body>
+</html>

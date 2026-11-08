@@ -19,4 +19,9 @@ import java.math.BigDecimal;
 public record VarianteResumen(Long id, String sku, String codigoBarras, String talla, String color,
                               BigDecimal precioCompra, BigDecimal precioVenta,
                               int stockMinimo, int stock, boolean stockBajo) {
+
+    /** @return la variante en una frase corta, por ejemplo «M / Azul» */
+    public String descripcion() {
+        return TextoVariante.de(talla, color);
+    }
 }

@@ -15,8 +15,16 @@
     </p>
     <nav aria-label="Principal">
         <a th:href="@{/}" th:classappend="${activo == 'inicio'} ? 'activo'">Inicio</a>
+        <p class="nav-titulo">Operaciones</p>
+        <a th:href="@{/ventas}" th:classappend="${activo == 'ventas'} ? 'activo'">Ventas</a>
+        <a th:href="@{/compras}" th:classappend="${activo == 'compras'} ? 'activo'">Compras</a>
+        <p class="nav-titulo">Catálogo</p>
         <a th:href="@{/productos}" th:classappend="${activo == 'productos'} ? 'activo'">Productos</a>
         <a th:href="@{/catalogo}" th:classappend="${activo == 'catalogo'} ? 'activo'">Categorías y marcas</a>
+        <p class="nav-titulo">Personas</p>
+        <a th:href="@{/clientes}" th:classappend="${activo == 'clientes'} ? 'activo'">Clientes</a>
+        <a th:href="@{/proveedores}" th:classappend="${activo == 'proveedores'} ? 'activo'">Proveedores</a>
+        <p class="nav-titulo">Cuenta</p>
         <a th:href="@{/tiendas}" th:classappend="${activo == 'tiendas'} ? 'activo'">Mis tiendas</a>
     </nav>
     <div class="usuario" th:if="${usuario != null}">
@@ -26,5 +34,8 @@
         </form>
     </div>
 </aside>
+<!-- Un importe en soles con dos decimales, por ejemplo «S/ 1,234.50». -->
+<span th:fragment="soles(valor)"
+      th:text="'S/ ' + ${#numbers.formatDecimal(valor, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</span>
 </body>
 </html>

@@ -285,11 +285,72 @@ body.entrada {
 .lista-simple li { padding: .5rem 0; border-bottom: 1px solid var(--linea); }
 
 
+/* ---- menú agrupado ---- */
+.lateral nav .nav-titulo {
+    margin: .9rem 0 .1rem;
+    padding: 0 .75rem;
+    color: var(--tiza);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+/* ---- ventas y compras ---- */
+.contenido-ancho { max-width: 78rem; }
+.acciones-cabecera { display: flex; flex-wrap: wrap; gap: .75rem; }
+.grupo-ancho { max-width: none; }
+input[type=search] {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: .5rem .75rem;
+    border: 1px solid var(--tinta-suave);
+    border-radius: 3px;
+    background: #fff;
+    font: inherit;
+    color: inherit;
+}
+input[type=search]:focus { outline: 3px solid var(--denim); outline-offset: 1px; }
+.filtro { max-width: 24rem; margin-bottom: .5rem; }
+
+.barra-total {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 2rem;
+    margin-top: 1rem;
+    padding: .85rem 1.1rem;
+    border-top: 3px solid var(--tiza);
+    background: var(--denim);
+    color: #fff;
+}
+.barra-total strong { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.barra-total .btn { margin-left: auto; }
+
+.datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .75rem 1.5rem; margin: 1rem 0; }
+.datos dt { color: var(--tinta-suave); font-size: .85rem; }
+.datos dd { margin: 0; font-weight: 600; }
+
+.totales { max-width: 24rem; margin: 1rem 0 1.5rem auto; padding: .75rem 1rem; border: 1px solid var(--linea); background: #fff; }
+.totales div { display: flex; justify-content: space-between; gap: 1rem; padding: .25rem 0; }
+.totales dt { color: var(--tinta-suave); }
+.totales dd { margin: 0; font-variant-numeric: tabular-nums; }
+.totales .total-final { margin-top: .35rem; padding-top: .5rem; border-top: 2px solid var(--denim); font-size: 1.2rem; font-weight: 700; }
+.totales .total-final dt { color: var(--tinta); }
+.totales .detalle-igv { font-size: .9rem; }
+
+.aviso-stock { max-width: 40rem; margin-bottom: 1rem; }
+.aviso-stock ul { margin: .35rem 0; padding-left: 1.1rem; }
+
 @media (max-width: 48rem) {
     .marco { grid-template-columns: 1fr; }
     .lateral { flex-direction: row; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; padding: .75rem 1rem; }
     .lateral::after { display: none; }
     .lateral nav { flex-direction: row; flex-wrap: wrap; }
     .tienda-activa { flex-direction: row; align-items: center; gap: .6rem; }
+    .lateral nav .nav-titulo { display: none; }
+    .totales { margin-left: 0; max-width: none; }
     .usuario { flex-direction: row; align-items: center; margin: 0 0 0 auto; }
 }

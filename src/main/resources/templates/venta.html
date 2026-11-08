@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Venta ' + ${venta.id})}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('ventas')}"></aside>
+    <main class="contenido">
+        <p class="migas"><a th:href="@{/ventas}">Ventas</a> / Venta <span th:text="${venta.id}">1</span></p>
+
+        <div class="cabecera-pagina">
+            <h1>Venta <span th:text="${venta.id}">1</span></h1>
+            <a class="btn btn-principal" th:href="@{/ventas/nueva}">Nueva venta</a>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+        <div class="aviso aviso-stock" role="status" th:if="${avisos != null and !#lists.isEmpty(avisos)}">
+            <strong>Poco stock después de esta venta:</strong>
+            <ul>
+                <li th:each="a : ${avisos}" th:text="${a}">Polo básico (POL-M-NEG): quedan 2, el mínimo es 5</li>
+            </ul>
+            <a th:href="@{/compras/nueva}">Registrar una compra para reponer</a>
+        </div>
+
+        <dl class="datos">
+            <div><dt>Fecha</dt><dd th:text="${venta.fechaTexto()}">06/11/2026 19:30</dd></div>
+            <div><dt>Cliente</dt>
+                <dd th:text="${venta.cliente != null} ? ${venta.cliente} : 'Cliente de mostrador'">Rosa Quispe</dd></div>
+            <div><dt>Medio de pago</dt><dd th:text="${venta.medioPagoTexto()}">Efectivo</dd></div>
+        </dl>
+
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Variante</th>
+                    <th scope="col">SKU</th>
+                    <th scope="col" class="num">Cantidad</th>
+                    <th scope="col" class="num">Precio</th>
+                    <th scope="col" class="num">Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="l : ${venta.lineas}">
+                    <td th:text="${l.producto}">Polo básico</td>
+                    <td th:text="${l.variante()}">M / Azul</td>
+                    <td th:text="${l.sku}">POL-M-AZU</td>
+                    <td class="num" th:text="${l.cantidad}">1</td>
+                    <td class="num"><span th:replace="~{fragmentos :: soles(${l.precioUnitario})}">S/ 0.00</span></td>
+                    <td class="num"><span th:replace="~{fragmentos :: soles(${l.subtotal})}">S/ 0.00</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <dl class="totales">
+            <div><dt>Subtotal</dt><dd><span th:replace="~{fragmentos :: soles(${venta.subtotal})}">S/ 0.00</span></dd></div>
+            <div th:if="${venta.descuento.signum() > 0}">
+                <dt>Descuento</dt>
+                <dd>− <span th:replace="~{fragmentos :: soles(${venta.descuento})}">S/ 0.00</span></dd>
+            </div>
+            <div class="total-final"><dt>Total pagado</dt><dd><span th:replace="~{fragmentos :: soles(${venta.total})}">S/ 0.00</span></dd></div>
+            <div class="detalle-igv"><dt>Base imponible</dt><dd><span th:replace="~{fragmentos :: soles(${venta.baseImponible()})}">S/ 0.00</span></dd></div>
+            <div class="detalle-igv"><dt>IGV incluido</dt><dd><span th:replace="~{fragmentos :: soles(${venta.igv})}">S/ 0.00</span></dd></div>
+        </dl>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Compras')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('compras')}"></aside>
+    <main class="contenido">
+        <div class="cabecera-pagina">
+            <div>
+                <h1>Compras</h1>
+                <p class="ayuda">Mercadería que esta tienda compró a sus proveedores, de lo más reciente a lo más antiguo.</p>
+            </div>
+            <a class="btn btn-principal" th:href="@{/compras/nueva}">Nueva compra</a>
+        </div>
+
+        <p class="exito" role="status" th:if="${mensaje}" th:text="${mensaje}">Listo</p>
+
+        <p class="vacio" th:if="${#lists.isEmpty(compras)}">
+            Esta tienda aún no registra compras. Empieza con «Nueva compra».
+        </p>
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(compras)}">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th scope="col">N.°</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Proveedor</th>
+                    <th scope="col" class="num">Unidades</th>
+                    <th scope="col" class="num">Total</th>
+                    <th scope="col"><span class="solo-lector">Detalle</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${compras}">
+                    <td th:text="${c.id}">1</td>
+                    <td th:text="${c.fechaTexto()}">06/11/2026 19:30</td>
+                    <td th:text="${c.proveedor}">Textiles Gamarra SAC</td>
+                    <td class="num" th:text="${c.unidades()}">20</td>
+                    <td class="num"><span th:replace="~{fragmentos :: soles(${c.total})}">S/ 0.00</span></td>
+                    <td><a th:href="@{/compras/{id}(id=${c.id})}">Ver detalle</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>
