@@ -344,6 +344,28 @@ input[type=search]:focus { outline: 3px solid var(--denim); outline-offset: 1px;
 .aviso-stock { max-width: 40rem; margin-bottom: 1rem; }
 .aviso-stock ul { margin: .35rem 0; padding-left: 1.1rem; }
 
+/* ---- alertas y reportes ---- */
+.pestanas { display: flex; flex-wrap: wrap; gap: .25rem; margin: 1rem 0 .5rem; border-bottom: 2px solid var(--linea); }
+.pestanas a {
+    margin-bottom: -2px;
+    padding: .55rem 1rem;
+    border-bottom: 3px solid transparent;
+    color: var(--tinta-suave);
+    text-decoration: none;
+}
+.pestanas a:hover { color: var(--tinta); }
+.pestanas a.activa { border-bottom-color: var(--tiza); color: var(--tinta); font-weight: 600; }
+.acciones-fila { display: flex; flex-wrap: wrap; gap: .5rem; }
+.acciones-fila form { margin: 0; }
+.lista-ancha { max-width: 52rem; }
+.atajos { margin: 1rem 0 0; font-size: .95rem; }
+.atajos a { margin-left: .75rem; }
+.libro dd .sello { font-size: inherit; }
+.tabla td.nivel-1 { padding-left: 2rem; }
+.tabla td.nivel-2 { padding-left: 3.25rem; }
+.tabla td.nivel-3 { padding-left: 4.5rem; }
+.tabla tr.fila-principal td { font-weight: 600; background: #f7f9fb; }
+
 @media (max-width: 48rem) {
     .marco { grid-template-columns: 1fr; }
     .lateral { flex-direction: row; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; padding: .75rem 1rem; }

@@ -32,7 +32,7 @@
                     th:classappend="${resumen.variantesConStockBajo > 0} ? 'atencion'">0</dd>
             </div>
             <div>
-                <dt>Alertas por revisar</dt>
+                <dt><a th:href="@{/alertas}">Alertas por revisar</a></dt>
                 <dd th:text="${resumen.alertasPendientes}"
                     th:classappend="${resumen.alertasPendientes > 0} ? 'atencion'">0</dd>
             </div>

@@ -1,6 +1,8 @@
 package pe.mypeinventario.web;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -49,6 +51,24 @@ final class Formularios {
         } catch (NumberFormatException e) {
             throw new OperacionInvalidaException("El " + campo + " debe ser un número entero");
         }
+    }
+
+    /** @return la fecha escrita (formato 2026-11-06) o el valor por defecto si el campo está vacío */
+    static LocalDate fecha(String valor, String campo, LocalDate porDefecto) {
+        if (valor == null || valor.isBlank()) {
+            return porDefecto;
+        }
+        try {
+            return LocalDate.parse(valor.trim());
+        } catch (DateTimeParseException e) {
+            throw new OperacionInvalidaException("La fecha " + campo + " no es válida");
+        }
+    }
+
+    /** @return el entero escrito o el valor por defecto si el campo está vacío */
+    static int enteroConDefecto(String valor, String campo, int porDefecto) {
+        Integer escrito = enteroOpcional(valor, campo);
+        return escrito == null ? porDefecto : escrito;
     }
 
     /** @return el identificador escrito, o {@code null} si el campo está vacío */

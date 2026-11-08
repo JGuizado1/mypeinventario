@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecera('Reportes')}"></head>
+<body>
+<div class="marco">
+    <aside th:replace="~{fragmentos :: menu('reportes')}"></aside>
+    <main class="contenido contenido-ancho">
+        <h1>Reportes</h1>
+        <p class="ayuda">Cómo van las ventas de esta tienda, qué se mueve y qué está parado.</p>
+
+        <form method="get" th:action="@{/reportes}">
+            <fieldset class="grupo grupo-ancho">
+                <legend>Periodo y opciones</legend>
+                <div class="rejilla">
+                    <div class="campo">
+                        <label for="desde">Desde</label>
+                        <input id="desde" name="desde" type="date" th:value="${desde}">
+                    </div>
+                    <div class="campo">
+                        <label for="hasta">Hasta (incluido)</label>
+                        <input id="hasta" name="hasta" type="date" th:value="${hasta}">
+                    </div>
+                    <div class="campo">
+                        <label for="limite">Cuántos productos más vendidos</label>
+                        <input id="limite" name="limite" type="number" min="1" max="100" step="1" th:value="${limite}">
+                    </div>
+                    <div class="campo">
+                        <label for="dias">Días sin ventas para considerar parado</label>
+                        <input id="dias" name="dias" type="number" min="1" max="3650" step="1" th:value="${dias}">
+                    </div>
+                </div>
+                <button class="btn btn-principal" type="submit">Ver reporte</button>
+                <p class="atajos">Atajos:
+                    <a th:href="@{/reportes(desde=${hoy},hasta=${hoy})}">Hoy</a>
+                    <a th:href="@{/reportes(desde=${hace7},hasta=${hoy})}">Últimos 7 días</a>
+                    <a th:href="@{/reportes(desde=${inicioMes},hasta=${hoy})}">Este mes</a>
+                    <a th:href="@{/reportes(desde=${hace30},hasta=${hoy})}">Últimos 30 días</a>
+                </p>
+            </fieldset>
+        </form>
+
+        <p class="error" role="alert" th:if="${error}" th:text="${error}">Error</p>
+
+        <th:block th:if="${informe != null}">
+            <h2>Resumen del periodo</h2>
+            <dl class="libro">
+                <div><dt>Ventas realizadas</dt><dd th:text="${informe.resumen.cantidadVentas}">0</dd></div>
+                <div><dt>Ventas antes de descuentos</dt>
+                    <dd><span th:replace="~{fragmentos :: soles(${informe.resumen.ventasBrutas})}">S/ 0.00</span></dd></div>
+                <div><dt>Descuentos</dt>
+                    <dd><span th:replace="~{fragmentos :: soles(${informe.resumen.descuentos})}">S/ 0.00</span></dd></div>
+                <div><dt>Total cobrado</dt>
+                    <dd><span th:replace="~{fragmentos :: soles(${informe.resumen.totalCobrado})}">S/ 0.00</span></dd></div>
+                <div><dt>IGV incluido</dt>
+                    <dd><span th:replace="~{fragmentos :: soles(${informe.resumen.igv})}">S/ 0.00</span></dd></div>
+                <div><dt>Costo de lo vendido</dt>
+                    <dd><span th:replace="~{fragmentos :: soles(${informe.resumen.costo})}">S/ 0.00</span></dd></div>
+                <div><dt>Utilidad bruta</dt>
+                    <dd><span th:replace="~{fragmentos :: soles(${informe.resumen.utilidadBruta})}">S/ 0.00</span></dd></div>
+            </dl>
+            <p class="aviso" th:if="${informe.resumen.lineasSinCosto > 0}">
+                <span th:text="${informe.resumen.lineasSinCosto}">1</span> línea(s) vendida(s) no tenían costo
+                registrado: la utilidad puede salir mayor de lo real. Registra el precio de compra en cada producto.
+            </p>
+
+            <h2 class="separado">Más vendidos</h2>
+            <p class="vacio" th:if="${#lists.isEmpty(informe.masVendidos)}">No hubo ventas en este periodo.</p>
+            <div class="tabla-scroll" th:unless="${#lists.isEmpty(informe.masVendidos)}">
+                <table class="tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Talla</th>
+                        <th scope="col">Color</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col" class="num">Unidades</th>
+                        <th scope="col" class="num">Ingresos</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${informe.masVendidos}">
+                        <td th:text="${p.producto}">Polo básico</td>
+                        <td th:text="${p.talla != null} ? ${p.talla} : '—'">M</td>
+                        <td th:text="${p.color != null} ? ${p.color} : '—'">Negro</td>
+                        <td th:text="${p.sku}">POL-M-NEG</td>
+                        <td class="num" th:text="${p.unidades}">8</td>
+                        <td class="num"><span th:replace="~{fragmentos :: soles(${p.ingresos})}">S/ 0.00</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 class="separado">Ventas por categoría</h2>
+            <p class="ayuda">Cada categoría incluye lo vendido en sus subcategorías.</p>
+            <p class="vacio" th:if="${#lists.isEmpty(informe.categorias)}">No hubo ventas en este periodo.</p>
+            <div class="tabla-scroll" th:unless="${#lists.isEmpty(informe.categorias)}">
+                <table class="tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">Categoría</th>
+                        <th scope="col" class="num">Unidades</th>
+                        <th scope="col" class="num">Ingresos</th>
+                        <th scope="col" class="num">Costo</th>
+                        <th scope="col" class="num">Utilidad</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${informe.categorias}" th:classappend="${c.nivel == 0} ? 'fila-principal'">
+                        <td th:classappend="${'nivel-' + c.nivel}" th:text="${c.nombre}">Ropa</td>
+                        <td class="num" th:text="${c.unidades}">8</td>
+                        <td class="num"><span th:replace="~{fragmentos :: soles(${c.ingresos})}">S/ 0.00</span></td>
+                        <td class="num"><span th:replace="~{fragmentos :: soles(${c.costo})}">S/ 0.00</span></td>
+                        <td class="num"><span th:replace="~{fragmentos :: soles(${c.utilidad})}">S/ 0.00</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 class="separado">Sin rotación</h2>
+            <p class="ayuda">Variantes con stock que no se venden hace <strong th:text="${dias}">30</strong> días o más:
+                primero las que nunca se vendieron. Sirven para decidir qué rematar o dejar de comprar.</p>
+            <p class="vacio" th:if="${#lists.isEmpty(informe.sinRotacion)}">Ninguna variante está parada. ¡Todo rota!</p>
+            <div class="tabla-scroll" th:unless="${#lists.isEmpty(informe.sinRotacion)}">
+                <table class="tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Talla</th>
+                        <th scope="col">Color</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col" class="num">Stock</th>
+                        <th scope="col">Última venta</th>
+                        <th scope="col" class="num">Capital inmovilizado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="v : ${informe.sinRotacion}">
+                        <td th:text="${v.producto}">Polo básico</td>
+                        <td th:text="${v.talla != null} ? ${v.talla} : '—'">M</td>
+                        <td th:text="${v.color != null} ? ${v.color} : '—'">Negro</td>
+                        <td th:text="${v.sku}">POL-M-NEG</td>
+                        <td class="num" th:text="${v.stock}">12</td>
+                        <td th:text="${v.ultimaVentaTexto()}">Nunca</td>
+                        <td class="num">
+                            <th:block th:if="${v.capitalInmovilizado != null}">
+                                <span th:replace="~{fragmentos :: soles(${v.capitalInmovilizado})}">S/ 0.00</span>
+                            </th:block>
+                            <span th:if="${v.capitalInmovilizado == null}">Sin costo registrado</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+    </main>
+</div>
+</body>
+</html>

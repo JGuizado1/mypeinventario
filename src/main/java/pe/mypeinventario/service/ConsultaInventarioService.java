@@ -1,6 +1,8 @@
 package pe.mypeinventario.service;
 
+import java.util.Collection;
 import java.util.List;
+import pe.mypeinventario.consulta.AlertaResumen;
 import pe.mypeinventario.domain.AlertaReabastecimiento;
 import pe.mypeinventario.domain.EstadoAlerta;
 import pe.mypeinventario.domain.MovimientoInventario;
@@ -36,4 +38,24 @@ public interface ConsultaInventarioService {
      * @throws RecursoNoEncontradoException si la tienda no existe
      */
     List<AlertaReabastecimiento> listarAlertas(Long tiendaId, EstadoAlerta estado);
+
+    /**
+     * Lista las alertas de una tienda en alguno de los estados dados, con el producto y la
+     * variante a los que se refieren.
+     *
+     * @param tiendaId identificador de la tienda
+     * @param estados  estados buscados, por ejemplo pendiente y vista
+     * @return resúmenes de la más reciente a la más antigua
+     * @throws RecursoNoEncontradoException si la tienda no existe
+     */
+    List<AlertaResumen> listarResumenAlertas(Long tiendaId, Collection<EstadoAlerta> estados);
+
+    /**
+     * Devuelve una alerta con el producto y la variante a los que se refiere.
+     *
+     * @param alertaId identificador de la alerta
+     * @return el resumen de la alerta
+     * @throws RecursoNoEncontradoException si la alerta no existe
+     */
+    AlertaResumen obtenerResumenAlerta(Long alertaId);
 }

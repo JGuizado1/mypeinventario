@@ -18,6 +18,8 @@
         <p class="nav-titulo">Operaciones</p>
         <a th:href="@{/ventas}" th:classappend="${activo == 'ventas'} ? 'activo'">Ventas</a>
         <a th:href="@{/compras}" th:classappend="${activo == 'compras'} ? 'activo'">Compras</a>
+        <a th:href="@{/alertas}" th:classappend="${activo == 'alertas'} ? 'activo'">Alertas</a>
+        <a th:href="@{/reportes}" th:classappend="${activo == 'reportes'} ? 'activo'">Reportes</a>
         <p class="nav-titulo">Catálogo</p>
         <a th:href="@{/productos}" th:classappend="${activo == 'productos'} ? 'activo'">Productos</a>
         <a th:href="@{/catalogo}" th:classappend="${activo == 'catalogo'} ? 'activo'">Categorías y marcas</a>

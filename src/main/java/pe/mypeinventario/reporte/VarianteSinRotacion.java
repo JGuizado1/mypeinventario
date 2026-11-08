@@ -2,6 +2,7 @@ package pe.mypeinventario.reporte;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Una variante con stock que no se vende hace tiempo.
@@ -18,4 +19,9 @@ import java.time.LocalDateTime;
 public record VarianteSinRotacion(Long varianteId, String sku, String producto, String talla,
                                   String color, long stock, LocalDateTime ultimaVenta,
                                   BigDecimal capitalInmovilizado) {
+
+    /** @return la fecha de la última venta como «06/11/2026», o «Nunca» si jamás se vendió */
+    public String ultimaVentaTexto() {
+        return ultimaVenta == null ? "Nunca" : DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ultimaVenta);
+    }
 }
