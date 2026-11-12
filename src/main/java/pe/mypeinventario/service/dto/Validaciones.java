@@ -6,7 +6,7 @@ import pe.mypeinventario.exception.OperacionInvalidaException;
 /** Validaciones de texto que comparten las solicitudes. */
 final class Validaciones {
 
-    private static final Pattern CORREO = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+    private static final Pattern CORREO = Pattern.compile("^[^@\\s]+@[^@\\s.]+\\.[^@\\s]+$");
     private static final Pattern CELULAR = Pattern.compile("\\d{9}");
 
     private Validaciones() {

@@ -1,5 +1,7 @@
 package pe.mypeinventario.consulta;
 
+import java.io.Serializable;
+
 /**
  * Vista de solo lectura de una tienda.
  *
@@ -8,5 +10,5 @@ package pe.mypeinventario.consulta;
  * @param direccion dirección, o {@code null}
  * @param galeria   galería o centro comercial, o {@code null}
  */
-public record TiendaResumen(Long id, String nombre, String direccion, String galeria) {
+public record TiendaResumen(Long id, String nombre, String direccion, String galeria) implements Serializable {
 }

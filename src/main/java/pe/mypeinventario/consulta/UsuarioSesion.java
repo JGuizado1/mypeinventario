@@ -1,5 +1,7 @@
 package pe.mypeinventario.consulta;
 
+import java.io.Serializable;
+
 /**
  * Datos mínimos de quien inició sesión. Nunca incluye la contraseña ni su hash.
  *
@@ -7,5 +9,5 @@ package pe.mypeinventario.consulta;
  * @param nombre nombre
  * @param correo correo con el que ingresa
  */
-public record UsuarioSesion(Long id, String nombre, String correo) {
+public record UsuarioSesion(Long id, String nombre, String correo) implements Serializable {
 }
