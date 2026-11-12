@@ -22,7 +22,12 @@ import pe.mypeinventario.fachada.AjusteFacade;
 @RequestMapping("/ajustes")
 public class AjusteController {
 
-    /** La variante elegida junto con el producto al que pertenece, para mostrarla en la pantalla. */
+    /**
+     * La variante elegida junto con el producto al que pertenece, para mostrarla en la pantalla.
+     *
+     * @param producto producto al que pertenece la variante
+     * @param variante variante elegida
+     */
     public record Seleccion(ProductoResumen producto, VarianteResumen variante) {
     }
 
